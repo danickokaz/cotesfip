@@ -1,11 +1,46 @@
+<?php
+session_start();
+require __DIR__.'../../settings/bdd.php';
+if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
+  $session = htmlspecialchars($_SESSION['visa']);
+
+  $req = database()->prepare("SELECT 
+  utilisateur.token_utilisateur,
+  utilisateur.pseudo,
+  utilisateur.id,
+  service_pourvoyeur.abreviation as service_utilisateur,
+  role_utilisateur.libelle_role as role_utilisateur
+  FROM utilisateur 
+  INNER JOIN service_pourvoyeur ON utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
+  INNER JOIN role_utilisateur ON utilisateur.id_role = role_utilisateur.id
+  WHERE token_utilisateur=?");
+  $req->execute([$session]);
+
+  if($req->rowCount() == 1){
+    $donneesUtilisateur = $req->fetch(PDO::FETCH_OBJ);
+
+    $pseudo = $donneesUtilisateur->pseudo;
+    $service_utilisateur  = $donneesUtilisateur->service_utilisateur;
+    $role_utilisateur = $donneesUtilisateur->role_utilisateur;
+
+
+  }else{
+    header(header: "location: connexion");
+  }
+
+}else{
+  header(header: "location: connexion");
+}
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
   <!-- Required meta tags --> 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Regal Admin</title>
+  <title>COTESFIP</title>
   <!-- base:css -->
   <link rel="stylesheet" href="../vendors/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="../vendors/feather/feather.css">
@@ -27,9 +62,7 @@
   <div class="container-scroller">
     <!-- partial:partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-        
-      </div>
+     
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
           <span class="icon-menu"></span>
@@ -98,10 +131,10 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
               <p class="mb-0 font-weight-normal float-left dropdown-header">Paramètres</p>
-              <a class="dropdown-item preview-item">               
+              <a class="dropdown-item preview-item" href="profil">               
                   <i class="icon-head"></i> Profil
               </a>
-              <a class="dropdown-item preview-item">
+              <a class="dropdown-item preview-item" href="deconnexion">
                   <i class="icon-inbox"></i> Se déconnecter
               </a>
             </div>
@@ -116,7 +149,106 @@
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <!-- partial:partials/_sidebar.html -->
-      <?php require 'menu/sidebar.php' ?>
+      <nav class="sidebar sidebar-offcanvas p-0" id="sidebar" >
+        <div class="user-profile">
+          <div class="user-image">
+            <img src="../images/armoiri.png">
+          </div>
+          <div class="user-name">
+              <?= $pseudo. " ({$service_utilisateur})" ?>
+          </div>
+          <div class="user-designation">
+              <?= $role_utilisateur ?>
+          </div>
+        </div>
+        <ul class="nav p-0">
+          <li class="nav-item p-0">
+            <a class="nav-link" href="accueil">
+              <i class="fa fa-home menu-icon"></i>
+              <span class="menu-title">Accueil</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#ajouter_donnees" aria-expanded="false" aria-controls="ui-basic">
+              <i class="fa fa-plus menu-icon"></i>
+              <span class="menu-title">Ajouter données</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ajouter_donnees">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="ajouterprevision">Prévision</a></li>
+                <li class="nav-item"> <a class="nav-link" href="ajouterrealisation">Réalisation</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#consulter_donnees" aria-expanded="false" aria-controls="ui-basic">
+              <i class="fa fa-database menu-icon"></i>
+              <span class="menu-title">Consulter données</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="consulter_donnees">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="consulterprevision">Prévision</a></li>
+                <li class="nav-item"> <a class="nav-link" href="consulterrealisation">Réalisation</a></li>
+              </ul>
+            </div>
+          </li>
+
+          
+          <li class="nav-item">
+            <a class="nav-link" href="modifierdonnees">
+              <i class="fa fa-edit menu-icon"></i>
+              <span class="menu-title">Modifier données </span>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#statistiques" aria-expanded="false" aria-controls="ui-basic">
+              <i class="fa fa-chart-line  menu-icon"></i>
+              <span class="menu-title">Statistiques globales</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="statistiques">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="statistiquesparnature">Par nature</a></li>
+                <li class="nav-item"> <a class="nav-link" href="statistiquesparprovince">Par province</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#affectation" aria-expanded="false" aria-controls="ui-basic">
+              <i class="fa fa-user-plus  menu-icon"></i>
+              <span class="menu-title">Affectation utilisateur</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="affectation">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="utilisateurprovince">utilisateur dans province</a></li>
+                <li class="nav-item"> <a class="nav-link" href="utilisateurcentre">utilisateur dans centre</a></li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#importation" aria-expanded="false" aria-controls="ui-basic">
+              <i class="fa fa-upload  menu-icon"></i>
+              <span class="menu-title">Importation</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="importation">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link" href="importerprovince"> Province</a></li>
+                <li class="nav-item"> <a class="nav-link" href="importercentre">Centre de perception</a></li>
+              </ul>
+            </div>
+          </li>
+
+          
+        </ul>
+      </nav>
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">

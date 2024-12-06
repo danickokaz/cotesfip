@@ -22663,7 +22663,7 @@ dl li {
     font-family: "Karla", sans-serif;
     font-weight: normal;
     padding: 0;
-    width: 240px;
+    width: 350px;
     z-index: 11;
     transition: width 0.25s ease, background 0.25s ease;
     -webkit-transition: width 0.25s ease, background 0.25s ease;
@@ -23009,7 +23009,7 @@ dl li {
     color: #000000;
     padding-left: 2.5rem;
     padding-right: 2.5rem;
-    width: calc(100% - 240px);
+    width: 100%;
     height: 60px;
     -webkit-box-shadow: 0px 3px 21px 0px rgba(0, 0, 0, 0.1);
     -moz-box-shadow: 0px 3px 21px 0px rgba(0, 0, 0, 0.1);
