@@ -1,0 +1,16 @@
+{
+    "name": "dsi/cotesfip",
+    "autoload": {
+        "psr-4": {
+            "Dsi\\Cotesfip\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "dankazadi"
+        }
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^3.5"
+    }
+}

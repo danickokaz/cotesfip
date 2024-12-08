@@ -1,0 +1,23 @@
+RewriteEngine On
+
+php_flag display_errors on
+php_value error_reporting 32767
+
+
+RewriteRule ^accueil$ accueil.php
+RewriteRule ^connexion$ index.php
+RewriteRule ^ajouterprevision$ ajouterprevision.php
+RewriteRule ^ajouterrealisation$ ajouterrealisation.php
+RewriteRule ^consulterprevision$ consulterprevision.php
+RewriteRule ^consulterrealisation$ consulterrealisation.php
+RewriteRule ^modifierdonnees$ modifierdonnees.php
+RewriteRule ^statistiquesparnature$ statistiquesparnature.php
+RewriteRule ^statistiquesparprovince$ statistiquesparprovince.php
+RewriteRule ^deconnexion$ deconnexion.php
+RewriteRule ^utilisateurcentre$ utilisateurcentre.php
+RewriteRule ^utilisateurprovince$ utilisateurprovince.php
+RewriteRule ^importercentre$ importercentre.php
+RewriteRule ^importerprovince$ importerprovince.php
+
+
+

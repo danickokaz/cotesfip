@@ -1,0 +1,16 @@
+{
+    "name": "finstat/cotesfip",
+    "autoload": {
+        "psr-4": {
+            "Finstat\\Cotesfip\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "dankazadi"
+        }
+    ],
+    "require": {
+        "phpoffice/phpexcel": "^1.8"
+    }
+}

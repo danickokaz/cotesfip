@@ -1,2 +1,2 @@
 # cotesfip
-Projet Cotesfip Min Finances RDC
+Ensemble du projet cotesfip
