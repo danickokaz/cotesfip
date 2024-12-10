@@ -136,22 +136,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
             </div>
           </li>
 
-          <li class="nav-item dropdown d-flex mr-4 ">
-            <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center"
-              id="notificationDropdown" href="#" data-toggle="dropdown">
-              <i class="icon-cog"></i>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
-              aria-labelledby="notificationDropdown">
-              <p class="mb-0 font-weight-normal float-left dropdown-header">Paramètres</p>
-              <a class="dropdown-item preview-item" href="profil">
-                <i class="icon-head"></i> Profil
-              </a>
-              <a class="dropdown-item preview-item" href="deconnexion">
-                <i class="icon-inbox"></i> Se déconnecter
-              </a>
-            </div>
-          </li>
+          
 
 
 

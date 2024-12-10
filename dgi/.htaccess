@@ -18,6 +18,11 @@ RewriteRule ^utilisateurcentre$ utilisateurcentre.php
 RewriteRule ^utilisateurprovince$ utilisateurprovince.php
 RewriteRule ^importercentre$ importercentre.php
 RewriteRule ^importerprovince$ importerprovince.php
+RewriteRule ^creerutilisateur$ creerutilisateur.php
+RewriteRule ^affecterutilisateur$ affecterutilisateur.php
+RewriteRule ^consulterdonnees$ consulterdonnees.php
+
+
 
 
 
