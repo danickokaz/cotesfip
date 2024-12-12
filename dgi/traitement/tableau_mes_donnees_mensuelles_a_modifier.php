@@ -114,25 +114,50 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
 
                     if($row['id_etat_donnee'] == 1){
                         // Affichage des natures de recettes
+
+                        // Affichage des natures de recettes
                         echo "<tr>";
-                        echo "<td>" . $numero++ . "</td>";
-                        echo "<td style='text-align:center;'>" . $row['code_nature'] . "</td>";
-                        echo "<td style='padding:10px;'>" . $row['libelle_nature_recette'] . "</td>";
-                        echo "<td style='text-align:center;'>" . $row['prevision'] . "</td>";
-                        echo "<td style='text-align:center;'>" . $row['realisation'] . "</td>";
+                        echo "<td>" . $row['code_nature'] . "</td>";
+                        echo "<td>" . $row['libelle_nature_recette'] . "</td>";
+                        echo "<td>" . $row['prevision'] . "</td>";
+                        echo "<td>" . $row['realisation'] . "</td>";
+
+                        // Conversion des valeurs en nombres pour le calcul
+                        $prevision = floatval($row['prevision']);
+                        $realisation = floatval($row['realisation']);
+
+                        // Validation pour éviter la division par zéro
+                        if ($prevision > 0) {
+                            $taux_realisation = ($realisation / $prevision) * 100;
+                            echo "<td>" . number_format($taux_realisation, 2) . " %</td>";
+                        } else {
+                            echo "<td> - </td>"; // Ou une autre indication pour zéro ou non applicable
+                        }
                         echo '<td style="text-align:center;cursor:pointer;"><i class="fa fa-edit btnModifierMesDonnees" id="'.$row['id'].'" ></i></td>';
                         echo "</tr>";
+
+                        
                     }else{
                         
-                            // Affichage des natures de recettes
-                            echo "<tr>";
-                            echo "<td>" . $numero++ . "</td>";
-                            echo "<td style='text-align:center;'>" . $row['code_nature'] . "</td>";
-                            echo "<td style='padding:10px;'>" . $row['libelle_nature_recette'] . "</td>";
-                            echo "<td style='text-align:center;'>" . $row['prevision'] . "</td>";
-                            echo "<td style='text-align:center;'>" . $row['realisation'] . "</td>";
-                            echo '<td></td>';
-                            echo "</tr>";
+                        echo "<tr>";
+                        echo "<td>" . $row['code_nature'] . "</td>";
+                        echo "<td>" . $row['libelle_nature_recette'] . "</td>";
+                        echo "<td>" . $row['prevision'] . "</td>";
+                        echo "<td>" . $row['realisation'] . "</td>";
+
+                        // Conversion des valeurs en nombres pour le calcul
+                        $prevision = floatval($row['prevision']);
+                        $realisation = floatval($row['realisation']);
+
+                        // Validation pour éviter la division par zéro
+                        if ($prevision > 0) {
+                            $taux_realisation = ($realisation / $prevision) * 100;
+                            echo "<td>" . number_format($taux_realisation, 2) . " %</td>";
+                        } else {
+                            echo "<td> - </td>"; // Ou une autre indication pour zéro ou non applicable
+                        }
+                        echo '<td style="text-align:center;cursor:pointer;"></td>';
+                        echo "</tr>";
                         
                     }
 

@@ -66,7 +66,7 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
 
                 // Génération du tableau HTML
                 echo "<table border='1'>";
-                echo "<thead><tr><th>Code</th><th>Nature de Recette</th><th>Prévision</th><th>Réalisation</th></tr></thead><tbody>";
+                echo "<thead><tr><th>Code</th><th>Nature de Recette</th><th>Prévision</th><th>Réalisation</th>Taux de realisation</th></tr></thead><tbody>";
 
                 $typeCourant = null;
                 $categorieCourante = null;
@@ -77,7 +77,7 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
                         $typeCourant = $row['type_recette'];
                         $categorieCourante = null; // Réinitialiser la catégorie
 
-                        echo "<tr><td colspan='4' style='background-color: #f0f0f0;'><strong>" . ($typeCourant ?? "") . "</strong></td></tr>";
+                        echo "<tr><td colspan='5' style='background-color: #f0f0f0;'><strong>" . ($typeCourant ?? "") . "</strong></td></tr>";
                     }
 
                     // Cas 2 : Nature de recette avec une catégorie
@@ -85,13 +85,13 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
                         $categorieCourante = $row['categorie_recette'];
 
                         if ($categorieCourante !== null) {
-                            echo "<tr><td colspan='4' style='background-color: #e0e0e0; padding-left: 20px;'><strong>" . $categorieCourante . "</strong></td></tr>";
+                            echo "<tr><td colspan='5' style='background-color: #e0e0e0; padding-left: 20px;'><strong>" . $categorieCourante . "</strong></td></tr>";
                         }
                     }
 
                     // Cas 3 : Nature de recette sans type ni catégorie
                     if ($row['type_recette'] === null && $row['categorie_recette'] === null) {
-                        echo "<tr><td colspan='4' style='background-color: #d0d0d0;'></strong></td></tr>";
+                        echo "<tr><td colspan='5' style='background-color: #d0d0d0;'></strong></td></tr>";
                     }
 
                     // Affichage des natures de recettes
@@ -100,7 +100,21 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
                     echo "<td>" . $row['libelle_nature_recette'] . "</td>";
                     echo "<td>" . $row['prevision'] . "</td>";
                     echo "<td>" . $row['realisation'] . "</td>";
+
+                    // Conversion des valeurs en nombres pour le calcul
+                    $prevision = floatval($row['prevision']);
+                    $realisation = floatval($row['realisation']);
+
+                    // Validation pour éviter la division par zéro
+                    if ($prevision > 0) {
+                        $taux_realisation = ($realisation / $prevision) * 100;
+                        echo "<td>" . number_format($taux_realisation, 2) . " %</td>";
+                    } else {
+                        echo "<td> - </td>"; // Ou une autre indication pour zéro ou non applicable
+                    }
+
                     echo "</tr>";
+
                 }
 
                 echo "</tbody></table>";

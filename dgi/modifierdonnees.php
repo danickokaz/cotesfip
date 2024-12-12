@@ -255,9 +255,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <button id="btnVoirDonnees" class="btn btn-info">Afficher</button>
-                                </div>
+                               
                             </form>
                         </div>
                     </div>

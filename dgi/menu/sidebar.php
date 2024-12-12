@@ -13,7 +13,7 @@
             </a>
           </li>
 
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#ajouter_donnees" aria-expanded="false" aria-controls="ui-basic">
               <i class="fa fa-plus menu-icon"></i>
               <span class="menu-title">Ajouter données</span>
@@ -25,7 +25,7 @@
                 <li class="nav-item"> <a class="nav-link" href="ajouterrealisation">Réalisation</a></li>
               </ul>
             </div>
-          </li>
+          </li> -->
 
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#consulter_donnees" aria-expanded="false" aria-controls="ui-basic">

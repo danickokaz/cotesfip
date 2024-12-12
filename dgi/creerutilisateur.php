@@ -417,10 +417,11 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                        
                         
                         if(response == "success"){
-                            province()
-                            role()
+                            utilisateur()
+                            // province()
+                            // role()
                             $("#pseudo").val('')
-                            $("#role").val('')
+                            // $("#role").val('')
                             $("#messageRetour").html(`
                                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                                     <strong>Félications!</strong> Utilisateur ajouté avec succès.
