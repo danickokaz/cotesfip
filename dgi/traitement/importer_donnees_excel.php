@@ -63,8 +63,8 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                 foreach ($data as $row) {
                     $code_nature = $row['0'];
                     $libelle_nature = $row['1'];
-                    $prevision = $row['2'];
-                    $realisation = $row['3'];
+                    $prevision = (float) $row['2'];
+                    $realisation = (float) $row['3'];
 
                     // verification
                     if ($code_nature === null && $libelle_nature === null) {
