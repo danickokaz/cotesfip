@@ -92,6 +92,8 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                         $id_categorie_nature_impot = $data->id_categorie_nature_impot;
                         $id_ordre  = $data->id;
 
+                        
+
                         $req = database()->prepare("INSERT INTO dgi_statistique (id_ordre,id_province,id_centre_perception,code_nature,libelle_nature_recette,id_type_nature_recette,id_categorie_nature_recette,id_mois,annee,prevision,realisation,date_ajout,id_etat_donnee) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
                         $req->execute([$id_ordre,$id_province,$id_centre_perception,$code_nature,trim($libelle_nature),$id_type_nature_impot,$id_categorie_nature_impot,$mois,$annee,$prevision,$realisation,date('Y-m-d'),1]);
