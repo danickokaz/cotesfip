@@ -133,7 +133,7 @@ try {
                         </tr>
                     <?php endforeach; ?>
                     <tr class="table-warning">
-                        <td colspan="2"><strong><?= htmlspecialchars($province) ?></strong></td>
+                        <td colspan="2" align="center"><strong><?= htmlspecialchars($province) ?></strong></td>
                         <?php foreach ($mois_noms as $id => $mois): 
                             $totaux_generaux[$id]['prevision'] += $sous_total_prevision[$id];
                             $totaux_generaux[$id]['realisation'] += $sous_total_realisation[$id];
@@ -144,7 +144,7 @@ try {
                     </tr>
                 <?php endforeach; ?>
                 <tr class="table-primary">
-                    <td colspan="2"><strong>Total Général</strong></td>
+                    <td colspan="2" align="center"><strong>Total Général</strong></td>
                     <?php foreach ($mois_noms as $id => $mois): ?>
                         <td class="text-end"><strong><?= number_format($totaux_generaux[$id]['prevision'], 2, ',', '.') ?></strong></td>
                         <td class="text-end"><strong><?= number_format($totaux_generaux[$id]['realisation'], 2, ',', '.') ?></strong></td>

@@ -9,10 +9,12 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
   utilisateur.pseudo,
   utilisateur.id,
   service_pourvoyeur.abreviation as service_utilisateur,
-  role_utilisateur.libelle_role as role_utilisateur
+  role_utilisateur.libelle_role as role_utilisateur,
+  dgi_centre_perception.libelle_centre as centre_perception
   FROM utilisateur 
   INNER JOIN service_pourvoyeur ON utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
   INNER JOIN role_utilisateur ON utilisateur.id_role = role_utilisateur.id
+  LEFT JOIN dgi_centre_perception ON  dgi_centre_perception.id = utilisateur.id_centre_perception
   WHERE token_utilisateur=?");
   $req->execute([$session]);
 
@@ -22,6 +24,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
     $pseudo = $donneesUtilisateur->pseudo;
     $service_utilisateur  = $donneesUtilisateur->service_utilisateur;
     $role_utilisateur = $donneesUtilisateur->role_utilisateur;
+    $centre_perception = $donneesUtilisateur->centre_perception;
 
 
   }else{
@@ -141,7 +144,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                         <img src="../images/armoiri.png">
                     </div>
                     <div class="user-name">
-                        <?= $pseudo. " ({$service_utilisateur})" ?>
+                        <?= $pseudo. " ({$service_utilisateur} / {$centre_perception})" ?>
                     </div>
                     <div class="user-designation">
                         <?= $role_utilisateur ?>
@@ -176,7 +179,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
-                                                    <label for="mois">Choisir les colonnes à importer</label>
+                                                    <label for="mois">Choisir le mois</label>
                                                     <select class="form-control" id="mois" name="mois">
                                                         <option value="1">Janvier</option>
                                                         <option value="2">Février</option>
@@ -198,7 +201,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                                 <div class="form-group">
                                                     <label for="annee">Choisir l'annee</label>
                                                     <select class="form-control" id="annee" name="annee">
-                                                        <?php for($i=date('Y')+1;$i>=date('Y');$i--): ?>
+                                                        <?php for($i=2024;$i<=date('Y');$i++): ?>
                                                         <option value="<?= $i ?>"><?= $i ?></option>
                                                         <?php endfor; ?>
                                                     </select>
@@ -247,7 +250,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                             <label for="anneeVoirDonnees">Choisir l'annee</label>
                                             <select class="form-control" id="anneeVoirDonnees" name="anneeVoirDonnees">
                                                 <option value="">Veuillez choisir une annee</option>
-                                                <?php for($i=date('Y')+1;$i>=date('Y');$i--): ?>
+                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
                                                 <option value="<?= $i ?>"><?= $i ?></option>
                                                 <?php endfor; ?>
                                             </select>
@@ -255,7 +258,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                         </div>
                                     </div>
                                 </div>
-                               
+
                             </form>
                         </div>
                     </div>
@@ -301,6 +304,85 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
 
                         </div>
                     </div>
+
+
+                    <div class="modal fade" id="modalVoirStatsGloblesParNature" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">STATISTIQUES GLOBALES PAR NATURE</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formulaireVoirStatsGlobalesParNature" method="post">
+                                        <div class="form-group">
+                                            <label for="anneeStatsGlobalesParNature">Choisir l'annee</label>
+                                            <select class="form-control" id="anneeStatsGlobalesParNature"
+                                                name="anneeStatsGlobalesParNature">
+                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
+                                                <option value="<?= $i ?>"><?= $i ?></option>
+                                                <?php endfor; ?>
+                                            </select>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Annuler</button>
+                                            <button type="submit" class="btn btn-info">Voir</button>
+                                        </div>
+
+
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="modal fade" id="modalVoirStatsGloblesParProvince" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">STATISTIQUES GLOBALES PAR PROVINCES
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formulaireVoirStatsGlobalesPaProvince" method="post">
+                                        <div class="form-group">
+                                            <label for="anneeStatsGlobalesParProvince">Choisir l'annee</label>
+                                            <select class="form-control" id="anneeStatsGlobalesParProvince"
+                                                name="anneeStatsGlobalesParProvince">
+                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
+                                                <option value="<?= $i ?>"><?= $i ?></option>
+                                                <?php endfor; ?>
+                                            </select>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Annuler</button>
+                                            <button type="submit" class="btn btn-info">Voir</button>
+                                        </div>
+
+
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
 
                     <div class="container">
                         <div id="tableau_voir_mes_donnees"></div>
@@ -368,7 +450,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
             })
 
             $(document).on('click', '.btnModifierMesDonnees', function () {
-                
+
                 var mois = $('#moisVoirDonnees').val();
                 var annee = $('#anneeVoirDonnees').val();
                 var id_modifier = $(this).attr('id');
@@ -385,7 +467,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                         console.log(response);
                         $("#titre").html(response)
 
-                        
+
                     },
                     error: function () {
                         alert('Erreur');
@@ -406,18 +488,18 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
 
                         $("#modalModifierDonnees").modal("show");
 
-                        
+
                     },
                     error: function () {
                         alert('Erreur');
                     }
                 })
 
-                
+
             })
 
 
-            $("#formulaireModifierDonnees").submit(function(){
+            $("#formulaireModifierDonnees").submit(function () {
                 event.preventDefault()
 
                 $("#btnModifierDonnees").text('Chargement...')
@@ -430,9 +512,9 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                     dataType: 'text',
                     success: function (response) {
                         console.log(response);
-                        if (response =='success') {
+                        if (response == 'success') {
                             // alert(response);
-                            
+
                             Swal.fire({
                                 title: "Operation reussie!",
                                 text: "Donnees modifiees",
@@ -440,7 +522,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                             });
                             var mois = $("#moisVoirDonnees").val()
                             var annee = $("#anneeVoirDonnees").val()
-                            tableau(mois,annee)
+                            tableau(mois, annee)
                             $("#modalModifierDonnees").modal("hide");
                         } else {
                             alert(response.message);
@@ -475,6 +557,96 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
 
                 });
             }
+
+            $('#btnImporterDonneesExcel').click(function () {
+                event.preventDefault()
+                var formulaireImporter = new FormData($('#formulaireImporterDonneesExcel')[0]);
+                $("#btnImporterDonneesExcel").text('Chargement...')
+                $("#btnImporterDonneesExcel").prop('disabled', true);
+                $.ajax({
+                    url: 'traitement/importer_donnees_excel.php',
+                    type: 'POST',
+                    data: formulaireImporter,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response === "Success") {
+
+
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Importation réussie',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            location.href = "consulterdonnees"
+
+                        } else if (response === "Type de fichier invalide") {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Veuillez choisir un fichier de type (Xls, Xlsx ou csv)',
+                                showConfirmButton: true,
+
+                            });
+                        } else if (response == "Veuillez  choisir un fichier") {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Veuillez choisir un fichier',
+                                showConfirmButton: true,
+
+                            });
+                        } else {
+                            console.log(response)
+                        }
+                    },
+                    error: function () {
+                        alert('Erreur');
+                    },
+                    complete: function () {
+                        $("#btnImporterDonneesExcel").text('Importer')
+                        $("#btnImporterDonneesExcel").prop('disabled', false);
+                    }
+                });
+            });
+
+
+            $("#statistiquesparnature").click(function () {
+                event.preventDefault();
+                $("#modalVoirStatsGloblesParNature").modal("show");
+            })
+
+            $("#statistiquesparprovince").click(function () {
+                event.preventDefault();
+                $("#modalVoirStatsGloblesParProvince").modal("show");
+            })
+
+
+            $("#formulaireVoirStatsGlobalesParNature").submit(function () {
+                event.preventDefault()
+
+                var annee = $("#anneeStatsGlobalesParNature").val();
+
+                if (annee != "") {
+                    location.href = "globalesnature/" + annee
+                } else {
+                    alert('Veuillez choisir une année ')
+                }
+            })
+
+            $("#formulaireVoirStatsGlobalesPaProvince").submit(function () {
+                event.preventDefault()
+
+                var annee = $("#anneeStatsGlobalesParProvince").val();
+
+                if (annee != "") {
+                    location.href = "globalesprovince/" + annee
+                } else {
+                    alert('Veuillez choisir une année ')
+                }
+            })
 
         })
     </script>

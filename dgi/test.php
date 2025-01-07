@@ -162,7 +162,7 @@ try {
             <tbody>
                 <?php foreach ($data_grouped_by_type as $type => $type_data): ?>
                     <tr class="table-secondary">
-                        <td colspan="2"><strong><?= htmlspecialchars($type ?: '') ?></strong></td>
+                        <td colspan="2" align="center"><strong><?= htmlspecialchars($type ?: '') ?></strong></td>
                         <?php foreach ($mois_noms as $id => $mois): ?>
                             <td class="text-center"><?= number_format($type_data['total_prevision'][$id], 2, ',', '.') ?></td>
                             <td class="text-center"><?= number_format($type_data['total_realisation'][$id], 2, ',', '.') ?></td>
@@ -174,7 +174,7 @@ try {
 
                     <?php foreach ($type_data['categories'] as $categorie => $categorie_data): ?>
                         <tr class="table-info">
-                            <td colspan="2"><strong><?= htmlspecialchars($categorie) ?></strong></td>
+                            <td colspan="2" align="center"><strong><?= htmlspecialchars($categorie) ?></strong></td>
                             <?php foreach ($mois_noms as $id => $mois): ?>
                                 <td class="text-center"><?= number_format($categorie_data['total_prevision'][$id], 2, ',', '.') ?></td>
                                 <td class="text-center"><?= number_format($categorie_data['total_realisation'][$id], 2, ',', '.') ?></td>
@@ -211,7 +211,7 @@ try {
                 <?php endforeach; ?>
 
                 <tr class="table-primary">
-                    <td colspan="2"><strong>Total Prévision (Exclu)</strong></td>
+                    <td colspan="2" align="center"><strong>Total Prévision</strong></td>
                     <?php foreach ($mois_noms as $id => $mois): ?>
                         <td class="text-center"><?= number_format($totaux['total_prevision_exclu'][$id], 2, ',', '.') ?></td>
                         <td class="text-center"><?= number_format($totaux['total_realisation_exclu'][$id], 2, ',', '.') ?></td>
@@ -222,7 +222,7 @@ try {
                 </tr>
 
                 <tr class="table-success">
-                    <td colspan="2"><strong>Total Général (Exclu)</strong></td>
+                    <td colspan="2" align="center"><strong>Total Général</strong></td>
                     <?php foreach ($mois_noms as $id => $mois): ?>
                         <td class="text-center"><?= number_format($totaux['total_prevision_general'][$id], 2, ',', '.') ?></td>
                         <td class="text-center"><?= number_format($totaux['total_realisation_general'][$id], 2, ',', '.') ?></td>

@@ -59,8 +59,8 @@
             </a>
             <div class="collapse" id="statistiques">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="statistiquesparnature">Par nature</a></li>
-                <li class="nav-item"> <a class="nav-link" href="statistiquesparprovince">Par province</a></li>
+                <li class="nav-item" id="statistiquesparnature"> <a class="nav-link" href="statistiquesparnature" >Par nature</a></li>
+                <li class="nav-item" id="statistiquesparprovince"> <a class="nav-link" href="statistiquesparprovince" >Par province</a></li>
               </ul>
             </div>
           </li>

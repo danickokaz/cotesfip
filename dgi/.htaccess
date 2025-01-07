@@ -22,6 +22,11 @@ RewriteRule ^creerutilisateur$ creerutilisateur.php
 RewriteRule ^affecterutilisateur$ affecterutilisateur.php
 RewriteRule ^consulterdonnees$ consulterdonnees.php
 
+RewriteRule ^globalesnature/([0-9]+)$ globalesnature.php?annee=$1
+RewriteRule ^globalesprovince/([0-9]+)$ globalesprovince.php?annee=$1
+
+
+
 
 
 
