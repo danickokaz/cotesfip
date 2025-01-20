@@ -1,21 +1,22 @@
 <?php
 session_start();
 require __DIR__.'../../settings/bdd.php';
-if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
-  $session = htmlspecialchars($_SESSION['visa']);
+if(isset($_SESSION['access']) and !empty($_SESSION['access'])){
+  $session = htmlspecialchars($_SESSION['access']);
 
   $req = database()->prepare("SELECT 
-  utilisateur.token_utilisateur,
-  utilisateur.pseudo,
-  utilisateur.id,
-    utilisateur.id_role,
+  dgda_utilisateur.token_utilisateur,
+  dgda_utilisateur.pseudo,
+  dgda_utilisateur.id,
+  dgda_utilisateur.id_role,
+  dgda_utilisateur.id_service_pourvoyeur,
   service_pourvoyeur.abreviation as service_utilisateur,
   role_utilisateur.libelle_role as role_utilisateur,
-  dgi_centre_perception.libelle_centre as centre_perception
-  FROM utilisateur 
-  INNER JOIN service_pourvoyeur ON utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
-  INNER JOIN role_utilisateur ON utilisateur.id_role = role_utilisateur.id
-  LEFT JOIN dgi_centre_perception ON  dgi_centre_perception.id = utilisateur.id_centre_perception
+  dgda_centre_perception.libelle_centre_perception as centre_perception
+  FROM dgda_utilisateur 
+  INNER JOIN service_pourvoyeur ON dgda_utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
+  INNER JOIN role_utilisateur ON dgda_utilisateur.id_role = role_utilisateur.id
+  LEFT JOIN dgda_centre_perception ON  dgda_centre_perception.id = dgda_utilisateur.id_centre_perception
   WHERE token_utilisateur=?");
   $req->execute([$session]);
 
@@ -25,8 +26,11 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
     $pseudo = $donneesUtilisateur->pseudo;
     $service_utilisateur  = $donneesUtilisateur->service_utilisateur;
     $role_utilisateur = $donneesUtilisateur->role_utilisateur;
+    $id_service_pourvoyeur = $donneesUtilisateur->id_service_pourvoyeur;
     $centre_perception = $donneesUtilisateur->centre_perception;
     $id_role = $donneesUtilisateur->id_role;
+
+
 
 
   }else{
@@ -181,7 +185,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
-                                                    <label for="mois">Choisir le mois</label>
+                                                    <label for="mois">Choisir les colonnes à importer</label>
                                                     <select class="form-control" id="mois" name="mois">
                                                         <option value="1">Janvier</option>
                                                         <option value="2">Février</option>
@@ -214,91 +218,6 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                         <div class="container">
                                             <button class="btn btn-info" id="btnImporterDonneesExcel"
                                                 type="submit">Importer</button>
-                                        </div>
-                                </div>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="container">
-                        <h2>CONSULTER MES DONNEES PAR MOIS</h2>
-                        <div class="container">
-                            <form method="post" id="formualireVoirDonnees">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="label" for="moisVoirDonnees">Mois</label>
-                                            <select class="form-control" id="moisVoirDonnees" name="moisVoirDonnees">
-                                                <option value="">Veuillez choisir un mois</option>
-                                                <option value="1">Janvier</option>
-                                                <option value="2">Février</option>
-                                                <option value="3">Mars</option>
-                                                <option value="4">Avril</option>
-                                                <option value="5">Mai</option>
-                                                <option value="6">Juin</option>
-                                                <option value="7">Juillet</option>
-                                                <option value="8">Aout</option>
-                                                <option value="9">Septembre</option>
-                                                <option value="10">Octobre</option>
-                                                <option value="11">Novembre</option>
-                                                <option value="12">Décembre</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="anneeVoirDonnees">Choisir l'annee</label>
-                                            <select class="form-control" id="anneeVoirDonnees" name="anneeVoirDonnees">
-                                                <option value="">Veuillez choisir une annee</option>
-                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
-                                                <option value="<?= $i ?>"><?= $i ?></option>
-                                                <?php endfor; ?>
-                                            </select>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="modal fade bd-example-modal-lg" id="modalModifierDonnees" tabindex="-1" role="dialog"
-                        aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">MODIFIER VOS DONNEES</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div id="titre"></div>
-                                    <form method="POST" id="formulaireModifierDonnees">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="previsionModifier">Prevision</label>
-                                                    <input type="hidden" name="id_modifier" id="id_modifier">
-                                                    <input type="text" class="form-control" name="previsionModifier"
-                                                        id="previsionModifier">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="mois">Realisation</label>
-                                                    <input type="text" class="form-control" name="realisationModifier"
-                                                        id="realisationModifier">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="container">
-                                            <button class="btn btn-info" id="btnModifierDonnees"
-                                                type="submit">Modifier</button>
                                         </div>
                                 </div>
                                 </form>
@@ -384,7 +303,48 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                         </div>
                     </div>
 
+                    <div class="container">
+                        <h2>CONSULTER MES DONNEES PAR MOIS</h2>
+                        <div class="container">
+                            <form method="post" id="formualireVoirDonnees">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label" for="moisVoirDonnees">Mois</label>
+                                            <select class="form-control" id="moisVoirDonnees" name="moisVoirDonnees">
+                                                <option value="1">Janvier</option>
+                                                <option value="2">Février</option>
+                                                <option value="3">Mars</option>
+                                                <option value="4">Avril</option>
+                                                <option value="5">Mai</option>
+                                                <option value="6">Juin</option>
+                                                <option value="7">Juillet</option>
+                                                <option value="8">Aout</option>
+                                                <option value="9">Septembre</option>
+                                                <option value="10">Octobre</option>
+                                                <option value="11">Novembre</option>
+                                                <option value="12">Décembre</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="anneeVoirDonnees">Choisir l'annee</label>
+                                            <select class="form-control" id="anneeVoirDonnees" name="anneeVoirDonnees">
+                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
+                                                <option value="<?= $i ?>"><?= $i ?></option>
+                                                <?php endfor; ?>
+                                            </select>
 
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button id="btnVoirDonnees" class="btn btn-info">Afficher</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
                     <div class="container">
                         <div id="tableau_voir_mes_donnees"></div>
@@ -436,131 +396,6 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                     }
                 });
             });
-
-            $('#moisVoirDonnees, #anneeVoirDonnees').on('change', function () {
-                var mois = $('#moisVoirDonnees').val();
-                var annee = $('#anneeVoirDonnees').val();
-
-                if (mois && annee) {
-
-                    tableau(mois, annee)
-
-                } else {
-
-                    Alert('Veuillez remplir les deux informations')
-                }
-            })
-
-            $(document).on('click', '.btnModifierMesDonnees', function () {
-
-                var mois = $('#moisVoirDonnees').val();
-                var annee = $('#anneeVoirDonnees').val();
-                var id_modifier = $(this).attr('id');
-                $("#id_modifier").val(id_modifier)
-
-                $.ajax({
-                    url: 'traitement/recuper_titre_par_id.php',
-                    method: 'POST',
-                    data: {
-                        id_modifier: id_modifier
-                    },
-                    dataType: 'html',
-                    success: function (response) {
-                        console.log(response);
-                        $("#titre").html(response)
-
-
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    }
-                })
-
-                $.ajax({
-                    url: 'traitement/recuper_champs_prevision_realisation_par_id.php',
-                    method: 'POST',
-                    data: {
-                        id_modifier: id_modifier
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                        console.log(response);
-                        $("#previsionModifier").val(response.prevision)
-                        $("#realisationModifier").val(response.realisation)
-
-                        $("#modalModifierDonnees").modal("show");
-
-
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    }
-                })
-
-
-            })
-
-
-            $("#formulaireModifierDonnees").submit(function () {
-                event.preventDefault()
-
-                $("#btnModifierDonnees").text('Chargement...')
-                $("#btnModifierDonnees").prop('disabled', true);
-
-                $.ajax({
-                    url: 'traitement/modifier_mes_donnees.php',
-                    type: 'POST',
-                    data: $("#formulaireModifierDonnees").serialize(),
-                    dataType: 'text',
-                    success: function (response) {
-                        console.log(response);
-                        if (response == 'success') {
-                            // alert(response);
-
-                            Swal.fire({
-                                title: "Operation reussie!",
-                                text: "Donnees modifiees",
-                                icon: "success"
-                            });
-                            var mois = $("#moisVoirDonnees").val()
-                            var annee = $("#anneeVoirDonnees").val()
-                            tableau(mois, annee)
-                            $("#modalModifierDonnees").modal("hide");
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    },
-                    complete: function () {
-                        $("#btnModifierDonnees").text('Modifier')
-                        $("#btnModifierDonnees").prop('disabled', false);
-                    }
-                })
-            })
-
-            // fonction qui permet d'afficher le tableau des donnees a modifier
-            function tableau(mois, annee) {
-                $.ajax({
-                    url: 'traitement/tableau_mes_donnees_mensuelles_a_modifier.php',
-                    type: 'POST',
-                    data: {
-                        moisVoirDonnees: mois,
-                        anneeVoirDonnees: annee
-                    },
-                    dataType: 'html',
-                    success: function (response) {
-                        console.log(response);
-                        document.getElementById("tableau_voir_mes_donnees").innerHTML = response
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    },
-
-                });
-            }
-            // Fin de la fonction qui permet d'afficher le tableau des donnees a modifier
 
             $('#btnImporterDonneesExcel').click(function () {
                 event.preventDefault()

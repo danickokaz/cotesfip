@@ -1,22 +1,22 @@
 <?php
 session_start();
 require __DIR__.'../../settings/bdd.php';
-if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
-  $session = htmlspecialchars($_SESSION['visa']);
+if(isset($_SESSION['access']) and !empty($_SESSION['access'])){
+  $session = htmlspecialchars($_SESSION['access']);
 
-  $req = database()->prepare("SELECT 
-  utilisateur.token_utilisateur,
-  utilisateur.pseudo,
-  utilisateur.id,
-    utilisateur.id_role,
-  utilisateur.id_service_pourvoyeur,
+  $req = database()->prepare("SELECT  
+  dgda_utilisateur.token_utilisateur,
+  dgda_utilisateur.pseudo,
+  dgda_utilisateur.id,
+  dgda_utilisateur.id_role,
+  dgda_utilisateur.id_service_pourvoyeur,
   service_pourvoyeur.abreviation as service_utilisateur,
   role_utilisateur.libelle_role as role_utilisateur,
-  dgi_centre_perception.libelle_centre as centre_perception
-  FROM utilisateur 
-  INNER JOIN service_pourvoyeur ON utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
-  INNER JOIN role_utilisateur ON utilisateur.id_role = role_utilisateur.id
-  LEFT JOIN dgi_centre_perception ON  dgi_centre_perception.id = utilisateur.id_centre_perception
+  dgda_centre_perception.libelle_centre_perception as centre_perception
+  FROM dgda_utilisateur 
+  INNER JOIN service_pourvoyeur ON dgda_utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
+  INNER JOIN role_utilisateur ON dgda_utilisateur.id_role = role_utilisateur.id
+  LEFT JOIN dgda_centre_perception ON  dgda_centre_perception.id = dgda_utilisateur.id_centre_perception
   WHERE token_utilisateur=?");
   $req->execute([$session]);
 
@@ -31,8 +31,8 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
     $id_role = $donneesUtilisateur->id_role;
 
 
-    $req = database()->prepare("SELECT * FROM province WHERE id_service=?");
-    $req->execute([$id_service_pourvoyeur]);
+    $req = database()->prepare("SELECT * FROM dgda_type_nature_economique");
+    $req->execute();
 
     if($req->rowCount() > 0){
       $donnees = $req->fetchAll(PDO::FETCH_OBJ);
@@ -174,10 +174,10 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
       <div class="main-panel">
         <div class="content-wrapper">
 
-          <h1>LISTE DE CENTRES DE PERCEPTION</h1>
+          <h1>NATURES ECONOMIQUES</h1>
 
           <div class="container">
-            <div id="tableau_centre"></div>
+            <div id="tableau_nature_economique"></div>
           </div>
 
 
@@ -194,11 +194,23 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                 </div>
                 <div class="modal-body">
                   <form id="formulaireModification" method="post">
-                    <select name="provinceM" id="provinceM" class="form-control">
-                      <?php foreach($donnees as $d): ?>
-                      <option value="<?= $d->id ?>"><?= $d->libelle_province ?></option>
-                      <?php endforeach; ?>
-                    </select>
+                    <div class="form-group mb-2">
+                        <label for="typeSecteur">Type</label>
+                        <select name="typeNature" id="typeNature" class="form-control">
+                            <option value="">Veuillez choisir un type</option>
+                        <?php foreach($donnees as $d): ?>
+                        <option value="<?= $d->id ?>"><?= $d->code_type_nature_economique.' / '. $d->libelle_type_nature_economique ?></option>
+                        <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="categorieNature">Catégorie</label>
+                        <select name="categorieNature" id="categorieNature" class="form-control"></select>
+                    </div>
+
+                    
+
                     <div class="modal-footer">
                       <button type="button" class="btn btn-info" id="confirmAction">Confirmer</button>
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
@@ -395,7 +407,46 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
   <script>
     $(document).ready(function () {
 
-      centre_perception()
+    nature_economique()
+
+    function nature_economique() {
+        $.ajax({
+          url: 'traitement/tableau_nature_economique2.php',
+          method: 'POST',
+          dataType: 'html',
+          success: function (response) {
+            document.getElementById('tableau_nature_economique').innerHTML = response
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+            console.log(xhr.status);
+            console.log(thrownError);
+          }
+        })
+    }
+
+
+    $("#typeNature").change(function(){
+        var id_type_nature = $(this).val();
+
+        $.ajax({
+            url: 'traitement/select_categorie_nature.php',
+            method: 'POST',
+            data: {id_type_nature: id_type_nature},
+            dataType: 'html',
+            success: function(data) {
+                $("#categorieNature").html(data)
+            },
+            // beforeSend: function(){
+            //     $("#categorieSecteur").html('<option value="">Chargement...</option>');
+            // },
+            error: function(xhr, ajaxOptions, thrownError) {
+                console.log(xhr.status);
+                console.log(thrownError);
+            }
+        })
+    })
+
+    
 
 
 
@@ -403,20 +454,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
         $("#modalImporterDonnees").modal("show");
       })
 
-      function centre_perception() {
-        $.ajax({
-          url: 'traitement/tableau_centre_perception.php',
-          method: 'POST',
-          dataType: 'html',
-          success: function (response) {
-            document.getElementById('tableau_centre').innerHTML = response
-          },
-          error: function (xhr, ajaxOptions, thrownError) {
-            console.log(xhr.status);
-            console.log(thrownError);
-          }
-        })
-      }
+      
 
       $('#btnImporter').click(function () {
         event.preventDefault()
@@ -431,7 +469,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
           processData: false,
           success: function (response) {
             if (response === "Success") {
-              centre_perception()
+              nature_economique()
               Swal.fire({
                 position: 'center',
                 icon: 'success',
@@ -504,11 +542,15 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
         }
       });
 
+
+      
+
       // Gérer la soumission à partir du bouton dans le modal
       $('#confirmAction').on('click', function () {
         // Récupérer les valeurs des cases cochées
         var selectedIds = getSelectedItems();
-        var province = $("#provinceM").val(); // Récupérer la province
+        var typeNature = $("#typeNature").val(); // Récupérer les types de secteurs 
+        var categorieNature = $("#categorieNature").val(); // Récupérer les categories
 
         // Vérifier si au moins une case est cochée
         if (selectedIds.length === 0) {
@@ -522,19 +564,20 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
 
         // Envoi des données via Ajax
         $.ajax({
-          url: 'traitement/affecter_centre_dans_province.php', // URL du script PHP
+          url: 'traitement/affecterTypeDansNatureEconomique.php', // URL du script PHP
           method: 'POST', // Méthode HTTP
           data: {
             ids: selectedIds,
-            province: province
+            typeNature: typeNature,
+            categorieNature: categorieNature,
           }, // Données envoyées
           success: function (response) {
-            console.log('Réponse brute du serveur:', response); // Affichez la réponse brute
             try {
-              const jsonResponse = JSON.parse(response); // Tentez de parser en JSON
+              var jsonResponse = JSON.parse(response); // Tentez de parser en JSON
+              console.log(jsonResponse);
               if (jsonResponse.status === 'success') {
                 // Mettre à jour la vue
-                centre_perception();
+                nature_economique();
 
                 // Message de succès
                 Swal.fire({
@@ -562,9 +605,10 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
             }
           },
           error: function (xhr, status, error) {
+            console.log(error);
             Swal.fire({
               title: "Erreur!",
-              text: "Une erreur est survennue",
+              text: "Une erreur est survennue"+error,
               icon: "error"
             });
           }

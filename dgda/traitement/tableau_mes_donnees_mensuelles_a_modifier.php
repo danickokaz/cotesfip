@@ -3,24 +3,24 @@ session_start();
 require __DIR__ . '../../../settings/bdd.php';
 require __DIR__ . '../../../vendor/autoload.php';
 
-if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
-    $session = htmlspecialchars($_SESSION['visa']);
+if (isset($_SESSION['access']) && !empty($_SESSION['access'])) {
+    $session = htmlspecialchars($_SESSION['access']);
   
     $req = database()->prepare("
         SELECT 
-            utilisateur.token_utilisateur,
-            utilisateur.pseudo,
-            utilisateur.id,
-            utilisateur.id_service_pourvoyeur,
-            utilisateur.id_role,
-            utilisateur.id_province,
-            utilisateur.id_centre_perception,
+            dgda_utilisateur.token_utilisateur,
+            dgda_utilisateur.pseudo,
+            dgda_utilisateur.id,
+            dgda_utilisateur.id_service_pourvoyeur,
+            dgda_utilisateur.id_role,
+            dgda_utilisateur.id_province,
+            dgda_utilisateur.id_centre_perception,
             service_pourvoyeur.abreviation as service_utilisateur,
             role_utilisateur.libelle_role as role_utilisateur
-        FROM utilisateur 
-        INNER JOIN service_pourvoyeur ON utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
-        INNER JOIN role_utilisateur ON utilisateur.id_role = role_utilisateur.id
-        WHERE token_utilisateur = ?
+        FROM dgda_utilisateur 
+        INNER JOIN service_pourvoyeur ON dgda_utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
+        INNER JOIN role_utilisateur ON dgda_utilisateur.id_role = role_utilisateur.id
+        WHERE dgda_utilisateur.token_utilisateur = ?
     ");
     $req->execute([$session]);
   
@@ -33,42 +33,37 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
         $id_service_pourvoyeur = $donneesUtilisateur->id_service_pourvoyeur;
         $id_province = $donneesUtilisateur->id_province;
         $id_centre_perception = $donneesUtilisateur->id_centre_perception;
-        $id_role = $donneesUtilisateur->id_role;
-
         
 
         if (isset($_POST['moisVoirDonnees'], $_POST['anneeVoirDonnees']) && !empty($_POST['moisVoirDonnees']) && !empty($_POST['anneeVoirDonnees'])) {
             $mois = htmlspecialchars($_POST['moisVoirDonnees']);
             $annee = htmlspecialchars($_POST['anneeVoirDonnees']);
 
-            function afficherTableau($centrePerception, $mois, $annee) {
+            function afficherTableau($centrePerception, $province, $mois, $annee) {
                 $bdd = database();
 
                 // Requête pour récupérer les données structurées
                 $sql = "
                     SELECT 
-                        tn.libelle_nature_impot AS type_recette,
-                        cn.libelle_categorie_nature_impot AS categorie_recette,
-                        s.id,
-                        mois.libelle_mois,
-                        s.id_etat_donnee,
+                        tn.libelle_type_nature_economique AS type_recette,
+                        cn.libelle_nature_economique AS categorie_recette,
                         s.code_nature,
-                        s.libelle_nature_recette,
+                        s.libelle_nature_economique,
                         s.prevision,
-                        s.realisation
-                    FROM dgi_statistique s
-                    LEFT JOIN dgi_type_nature_impot tn ON s.id_type_nature_recette = tn.id
-                    LEFT JOIN dgi_categorie_nature_impot cn ON s.id_categorie_nature_recette = cn.id
-                    INNER JOIN mois ON mois.id = s.id_mois
-                    WHERE s.id_centre_perception = ? AND s.id_mois = ? AND s.annee = ?
+                        s.realisation,
+                        s.id_etat_donnee,
+                        s.id
+                    FROM dgda_statistique s
+                    LEFT JOIN dgda_type_nature_economique tn ON s.id_type_nature_economique = tn.id
+                    LEFT JOIN dgda_categorie_nature_economique cn ON s.id_categorie_nature_economique = cn.id
+                    WHERE s.id_centre_perception = ? AND s.id_province=? AND s.id_mois = ? AND s.annee = ?
                     ORDER BY 
-                        tn.libelle_nature_impot IS NULL, tn.libelle_nature_impot ASC,
-                        cn.libelle_categorie_nature_impot IS NULL, cn.libelle_categorie_nature_impot DESC,
+                        
                         s.id_ordre ASC
                 ";
 
                 $stmt = $bdd->prepare($sql);
-                $stmt->execute([$centrePerception, $mois, $annee]);
+                $stmt->execute([$centrePerception,$province, $mois, $annee]);
                 $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $moisEnLettres = $mois == "1" ? "JANVIER" :
                  ($mois == "2" ? "FEVRIER" :
@@ -121,7 +116,7 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
                         // Affichage des natures de recettes
                         echo "<tr>";
                         echo "<td>" . $row['code_nature'] . "</td>";
-                        echo "<td>" . $row['libelle_nature_recette'] . "</td>";
+                        echo "<td>" . $row['libelle_nature_economique'] . "</td>";
                         echo "<td>" . $row['prevision'] . "</td>";
                         echo "<td>" . $row['realisation'] . "</td>";
 
@@ -144,7 +139,7 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
                         
                         echo "<tr>";
                         echo "<td>" . $row['code_nature'] . "</td>";
-                        echo "<td>" . $row['libelle_nature_recette'] . "</td>";
+                        echo "<td>" . $row['libelle_nature_economique'] . "</td>";
                         echo "<td>" . $row['prevision'] . "</td>";
                         echo "<td>" . $row['realisation'] . "</td>";
 
@@ -170,7 +165,7 @@ if (isset($_SESSION['visa']) && !empty($_SESSION['visa'])) {
                 echo "</tbody></table>";
             }
 
-            afficherTableau($id_centre_perception, $mois, $annee);
+            afficherTableau($id_centre_perception,$id_province, $mois, $annee);
         }
     }
 }

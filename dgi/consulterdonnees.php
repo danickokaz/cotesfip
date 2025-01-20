@@ -8,6 +8,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
   utilisateur.token_utilisateur,
   utilisateur.pseudo,
   utilisateur.id,
+utilisateur.id_role,
   service_pourvoyeur.abreviation as service_utilisateur,
   role_utilisateur.libelle_role as role_utilisateur,
   dgi_centre_perception.libelle_centre as centre_perception
@@ -25,6 +26,8 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
     $service_utilisateur  = $donneesUtilisateur->service_utilisateur;
     $role_utilisateur = $donneesUtilisateur->role_utilisateur;
     $centre_perception = $donneesUtilisateur->centre_perception;
+    $id_role = $donneesUtilisateur->id_role;
+
 
 
 

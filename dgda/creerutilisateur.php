@@ -1,21 +1,22 @@
 <?php
 session_start();
 require __DIR__.'../../settings/bdd.php';
-if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
-  $session = htmlspecialchars($_SESSION['visa']);
+if(isset($_SESSION['access']) and !empty($_SESSION['access'])){
+  $session = htmlspecialchars($_SESSION['access']);
 
   $req = database()->prepare("SELECT 
-  utilisateur.token_utilisateur,
-  utilisateur.pseudo,
-  utilisateur.id,
-    utilisateur.id_role,
+  dgda_utilisateur.token_utilisateur,
+  dgda_utilisateur.pseudo,
+  dgda_utilisateur.id,
+  dgda_utilisateur.id_role,
+  dgda_utilisateur.id_service_pourvoyeur,
   service_pourvoyeur.abreviation as service_utilisateur,
   role_utilisateur.libelle_role as role_utilisateur,
-  dgi_centre_perception.libelle_centre as centre_perception
-  FROM utilisateur 
-  INNER JOIN service_pourvoyeur ON utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
-  INNER JOIN role_utilisateur ON utilisateur.id_role = role_utilisateur.id
-  LEFT JOIN dgi_centre_perception ON  dgi_centre_perception.id = utilisateur.id_centre_perception
+  dgda_centre_perception.libelle_centre_perception as centre_perception
+  FROM dgda_utilisateur 
+  INNER JOIN service_pourvoyeur ON dgda_utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
+  INNER JOIN role_utilisateur ON dgda_utilisateur.id_role = role_utilisateur.id
+  LEFT JOIN dgda_centre_perception ON  dgda_centre_perception.id = dgda_utilisateur.id_centre_perception
   WHERE token_utilisateur=?");
   $req->execute([$session]);
 
@@ -25,16 +26,26 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
     $pseudo = $donneesUtilisateur->pseudo;
     $service_utilisateur  = $donneesUtilisateur->service_utilisateur;
     $role_utilisateur = $donneesUtilisateur->role_utilisateur;
+    $id_service_pourvoyeur = $donneesUtilisateur->id_service_pourvoyeur;
     $centre_perception = $donneesUtilisateur->centre_perception;
     $id_role = $donneesUtilisateur->id_role;
 
 
+
+    $req = database()->prepare("SELECT * FROM province WHERE id_service=?");
+    $req->execute([$id_service_pourvoyeur]);
+
+    if($req->rowCount() > 0){
+      $donnees = $req->fetchAll(PDO::FETCH_OBJ);
+    }
+
+
   }else{
-    header(header: "location: connexion");
+    header ("location: connexion");
   }
 
 }else{
-  header(header: "location: connexion");
+  header( "location: connexion");
 }
 ?>
 
@@ -42,8 +53,54 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
 <html lang="fr">
 
 <head>
-    <!-- Required meta tags -->
-    <?php require 'header/header.php' ?>
+    <?php require 'header/header.php'; ?>
+    <style>
+        .card {
+            max-width: 500px;
+            margin: 0 auto;
+            border-radius: 8px;
+            border: 1px solid #eaeaea;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            height: calc(2.5rem + 2px);
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-size: 1.2rem;
+            padding: 10px 30px;
+            border-radius: 6px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+    </style>
+
+
+
 </head>
 
 <body>
@@ -57,62 +114,18 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                 </button>
                 <ul class="navbar-nav mr-lg-2">
                     <li class="nav-item nav-search d-none d-lg-block">
-                        <!-- <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="search">
-                  <i class="icon-search"></i>
-                </span>
-              </div>
-              <input type="text" class="form-control" placeholder="Search Projects.." aria-label="search" aria-describedby="search">
-            </div> -->
+
                     </li>
                 </ul>
                 <ul class="navbar-nav navbar-nav-right">
 
-                    <!-- <li class="nav-item dropdown d-flex">
-            <a class="nav-link count-indicator dropdown-toggle d-flex justify-content-center align-items-center" id="messageDropdown" href="#" data-toggle="dropdown">
-              <i class="icon-air-play mx-0"></i>
-            </a>
-            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
-              <p class="mb-0 font-weight-normal float-left dropdown-header">Messages</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                    <img src="../images/armoiri.png" alt="image" class="profile-pic">
-                </div>
-                <div class="preview-item-content flex-grow">
-                  <h6 class="preview-subject ellipsis font-weight-normal">David Grey
-                  </h6>
-                  <p class="font-weight-light small-text text-muted mb-0">
-                    The meeting is cancelled
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                    <img src="../images/faces/face2.jpg" alt="image" class="profile-pic">
-                </div>
-                <div class="preview-item-content flex-grow">
-                  <h6 class="preview-subject ellipsis font-weight-normal">Tim Cook
-                  </h6>
-                  <p class="font-weight-light small-text text-muted mb-0">
-                    New product launch
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                    <img src="../images/faces/face3.jpg" alt="image" class="profile-pic">
-                </div>
-                <div class="preview-item-content flex-grow">
-                  <h6 class="preview-subject ellipsis font-weight-normal"> Johnson
-                  </h6>
-                  <p class="font-weight-light small-text text-muted mb-0">
-                    Upcoming board meeting
-                  </p>
-                </div>
-              </a>
-            </div>
-          </li> -->
+
+
+                    <li class="nav-item dropdown d-flex mr-4 ">
+                        <button class="btn btn-info" id="btnOuvrirModalCreerUtilisateur">Créer utilisateur</button>
+
+                    </li>
+
                     <li class="nav-item dropdown d-flex mr-4 ">
                         <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center"
                             id="notificationDropdown" href="#" data-toggle="dropdown">
@@ -129,6 +142,10 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                             </a>
                         </div>
                     </li>
+
+
+
+
 
                 </ul>
                 <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
@@ -152,11 +169,120 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                         <?= $role_utilisateur ?>
                     </div>
                 </div>
-                <?php require 'menu/sidebar.php' ?>
+                <?php require 'menu/sidebar.php'; ?>
             </nav>
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
+
+                    <h1>LISTE D'UTILISATEURS (DGI)</h1>
+
+                    <div class="container">
+                        <div id="tableau_utilisateur"></div>
+                    </div>
+
+
+
+                    <!-- Modal -->
+                    <div id="selectionModal" class="modal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Modifier les informations</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formulaireModification" method="post">
+                                        <select name="provinceM" id="provinceM" class="form-control">
+                                            <?php foreach($donnees as $d): ?>
+                                            <option value="<?= $d->id ?>"><?= $d->libelle_province ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-info"
+                                                id="confirmAction">Confirmer</button>
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Fermer</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="modalCreerUtilisateur" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+                        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Importer les donnees</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="POST" enctype="multipart/form-data" id="formulaireCreerUtilisateur">
+                                        <!-- File Input -->
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="province" class="form-label">Province</label>
+                                                    <select name="province" id="province" class="form-control">
+                                                        <option value="">Veuillez choisir une province</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="centre" class="form-label">Centre de perception</label>
+                                                    <select name="centre" id="centre" class="form-control">
+                                                        <option value="">Veuillez choisir un centre de perception
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="role" class="form-label">Role</label>
+                                                    <select name="role" id="role" class="form-control">
+                                                        <option value="">Veuillez choisir un role</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="pseudo" class="form-label">Pseudo</label>
+                                                    <input type="text" name="pseudo" id="pseudo" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="messageRetour"></div>
+
+                                        <!-- Submit Button -->
+                                        <div class="form-group text-center mt-4">
+                                            <button type="submit" id="btnEnregistrer"
+                                                class="btn btn-info btn-lg">Enregistrer</button>
+                                        </div>
+
+
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="modal fade bd-example-modal-lg" id="modalImporterDonneesExcel" tabindex="-1"
                         role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -181,7 +307,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
-                                                    <label for="mois">Choisir le mois</label>
+                                                    <label for="mois">Choisir les colonnes à importer</label>
                                                     <select class="form-control" id="mois" name="mois">
                                                         <option value="1">Janvier</option>
                                                         <option value="2">Février</option>
@@ -221,92 +347,6 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
 
                         </div>
                     </div>
-
-                    <div class="container">
-                        <h2>CONSULTER MES DONNEES PAR MOIS</h2>
-                        <div class="container">
-                            <form method="post" id="formualireVoirDonnees">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label class="label" for="moisVoirDonnees">Mois</label>
-                                            <select class="form-control" id="moisVoirDonnees" name="moisVoirDonnees">
-                                                <option value="">Veuillez choisir un mois</option>
-                                                <option value="1">Janvier</option>
-                                                <option value="2">Février</option>
-                                                <option value="3">Mars</option>
-                                                <option value="4">Avril</option>
-                                                <option value="5">Mai</option>
-                                                <option value="6">Juin</option>
-                                                <option value="7">Juillet</option>
-                                                <option value="8">Aout</option>
-                                                <option value="9">Septembre</option>
-                                                <option value="10">Octobre</option>
-                                                <option value="11">Novembre</option>
-                                                <option value="12">Décembre</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="anneeVoirDonnees">Choisir l'annee</label>
-                                            <select class="form-control" id="anneeVoirDonnees" name="anneeVoirDonnees">
-                                                <option value="">Veuillez choisir une annee</option>
-                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
-                                                <option value="<?= $i ?>"><?= $i ?></option>
-                                                <?php endfor; ?>
-                                            </select>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="modal fade bd-example-modal-lg" id="modalModifierDonnees" tabindex="-1" role="dialog"
-                        aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">MODIFIER VOS DONNEES</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <div id="titre"></div>
-                                    <form method="POST" id="formulaireModifierDonnees">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="previsionModifier">Prevision</label>
-                                                    <input type="hidden" name="id_modifier" id="id_modifier">
-                                                    <input type="text" class="form-control" name="previsionModifier"
-                                                        id="previsionModifier">
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label for="mois">Realisation</label>
-                                                    <input type="text" class="form-control" name="realisationModifier"
-                                                        id="realisationModifier">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="container">
-                                            <button class="btn btn-info" id="btnModifierDonnees"
-                                                type="submit">Modifier</button>
-                                        </div>
-                                </div>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-
 
                     <div class="modal fade" id="modalVoirStatsGloblesParNature" tabindex="-1" role="dialog"
                         aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -385,10 +425,17 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                     </div>
 
 
-
-                    <div class="container">
-                        <div id="tableau_voir_mes_donnees"></div>
+                    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog"
+                        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                ...
+                            </div>
+                        </div>
                     </div>
+
+
+
 
                 </div>
                 <!-- content-wrapper ends -->
@@ -400,167 +447,181 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
     </div>
     <!-- container-scroller -->
 
-    <!-- base:js -->
     <?php require 'footer/footer.php' ?>
-    <!-- End custom js for this page-->
+
+
+
     <script>
         $(document).ready(function () {
 
-            $(".importerDonneesExcel").click(function () {
+            utilisateur()
+
+            province()
+            role()
+
+
+
+            function utilisateur() {
+                $.ajax({
+                    url: 'traitement/tableau_utilisateur.php',
+                    method: 'POST',
+                    dataType: 'html',
+                    success: function (response) {
+                        console.log(response);
+                        document.getElementById('tableau_utilisateur').innerHTML = response
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr.status);
+                        console.log(thrownError);
+                    }
+
+                })
+            }
+
+
+
+
+            function province() {
+                $.ajax({
+                    url: 'traitement/selectProvince.php',
+                    method: 'POST',
+                    dataType: 'html',
+                    success: function (response) {
+                        console.log(response);
+                        $("#province").html(response)
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr.status);
+                        console.log(thrownError);
+                    },
+                    beforeSend: function () {
+                        $("#province").html("<option value=''>Chargement...</option>")
+                    }
+                })
+            }
+
+
+            function role() {
+                $.ajax({
+                    url: 'traitement/selectRole.php',
+                    method: 'POST',
+                    dataType: 'html',
+                    success: function (response) {
+                        console.log(response);
+                        $("#role").html(response)
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr.status);
+                        console.log(thrownError);
+                    },
+                    beforeSend: function () {
+                        $("#role").html("<option value=''>Chargement...</option>")
+                    }
+                })
+            }
+
+            $("#province").on('change', function () {
+                var province = $(this).val();
+                $.ajax({
+                    url: 'traitement/selectCentre.php',
+                    method: 'POST',
+                    data: {
+                        id_province: province
+                    },
+                    dataType: 'html',
+                    success: function (response) {
+                        console.log(response);
+                        $("#centre").html(response)
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr.status);
+                        console.log(thrownError);
+                    },
+                    beforeSend: function () {
+                        $("#centre").html("<option value=''>Chargement...</option>")
+                    }
+                })
+            })
+
+            $("#btnOuvrirModalCreerUtilisateur").on('click', function () {
+                $("#modalCreerUtilisateur").modal("show");
+            })
+
+
+            $("#formulaireCreerUtilisateur").submit(function () {
                 event.preventDefault();
-
-                $("#modalImporterDonneesExcel").modal("show");
-            })
-
-            $('#formualireVoirDonnees').submit(function () {
-                event.preventDefault()
-
-                $("#btnVoirDonnees").text('Chargement...')
-                $("#btnVoirDonnees").prop('disabled', true);
+                $("#btnEnregistrer").prop('disabled', true);
+                $("#btnEnregistrer").text("Chargement...")
+                var formData = new FormData(this);
                 $.ajax({
-                    url: 'traitement/tableau_mes_donnees_mensuelles.php',
-                    type: 'POST',
-                    data: $("#formualireVoirDonnees").serialize(),
-                    dataType: 'html',
-                    success: function (response) {
-                        console.log(response);
-                        document.getElementById("tableau_voir_mes_donnees").innerHTML =
-                            response
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    },
-                    complete: function () {
-                        $("#btnVoirDonnees").text('Afficher')
-                        $("#btnVoirDonnees").prop('disabled', false);
-                    }
-                });
-            });
-
-            $('#moisVoirDonnees, #anneeVoirDonnees').on('change', function () {
-                var mois = $('#moisVoirDonnees').val();
-                var annee = $('#anneeVoirDonnees').val();
-
-                if (mois && annee) {
-
-                    tableau(mois, annee)
-
-                } else {
-
-                    Alert('Veuillez remplir les deux informations')
-                }
-            })
-
-            $(document).on('click', '.btnModifierMesDonnees', function () {
-
-                var mois = $('#moisVoirDonnees').val();
-                var annee = $('#anneeVoirDonnees').val();
-                var id_modifier = $(this).attr('id');
-                $("#id_modifier").val(id_modifier)
-
-                $.ajax({
-                    url: 'traitement/recuper_titre_par_id.php',
+                    url: 'traitement/creerUtilisateur.php',
                     method: 'POST',
-                    data: {
-                        id_modifier: id_modifier
-                    },
-                    dataType: 'html',
-                    success: function (response) {
-                        console.log(response);
-                        $("#titre").html(response)
-
-
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    }
-                })
-
-                $.ajax({
-                    url: 'traitement/recuper_champs_prevision_realisation_par_id.php',
-                    method: 'POST',
-                    data: {
-                        id_modifier: id_modifier
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                        console.log(response);
-                        $("#previsionModifier").val(response.prevision)
-                        $("#realisationModifier").val(response.realisation)
-
-                        $("#modalModifierDonnees").modal("show");
-
-
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    }
-                })
-
-
-            })
-
-
-            $("#formulaireModifierDonnees").submit(function () {
-                event.preventDefault()
-
-                $("#btnModifierDonnees").text('Chargement...')
-                $("#btnModifierDonnees").prop('disabled', true);
-
-                $.ajax({
-                    url: 'traitement/modifier_mes_donnees.php',
-                    type: 'POST',
-                    data: $("#formulaireModifierDonnees").serialize(),
+                    data: formData,
+                    contentType: false,
+                    processData: false,
                     dataType: 'text',
                     success: function (response) {
                         console.log(response);
-                        if (response == 'success') {
-                            // alert(response);
 
-                            Swal.fire({
-                                title: "Operation reussie!",
-                                text: "Donnees modifiees",
-                                icon: "success"
-                            });
-                            var mois = $("#moisVoirDonnees").val()
-                            var annee = $("#anneeVoirDonnees").val()
-                            tableau(mois, annee)
-                            $("#modalModifierDonnees").modal("hide");
+
+                        if (response == "success") {
+                            utilisateur()
+                            // province()
+                            // role()
+                            $("#pseudo").val('')
+                            // $("#role").val('')
+                            $("#messageRetour").html(`
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <strong>Félications!</strong> Utilisateur ajouté avec succès.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            `);
+                            setTimeout(() => {
+                                $("#messageRetour").html('<div></div>')
+                            }, 1000);
+                        } else if (response == "Champs vides") {
+                            $("#messageRetour").html(`
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>Import!</strong> Veuillez saisir les champs obligatoires.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            `);
+                            setTimeout(() => {
+                                $("#messageRetour").html('<div></div>')
+                            }, 2500);
+                        } else if (response == "deja") {
+                            $("#messageRetour").html(`
+                                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                    <strong>Important!</strong> Utilsateur existe déjà.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            `);
+                            setTimeout(() => {
+                                $("#messageRetour").html('<div></div>')
+                            }, 2500);
                         } else {
-                            alert(response.message);
+                            console.log(response)
                         }
                     },
-                    error: function () {
-                        alert('Erreur');
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(xhr.status);
+                        console.log(thrownError);
                     },
                     complete: function () {
-                        $("#btnModifierDonnees").text('Modifier')
-                        $("#btnModifierDonnees").prop('disabled', false);
+                        $("#btnEnregistrer").prop('disabled', false);
+                        $("#btnEnregistrer").text("Enregistrer")
+
                     }
+
                 })
             })
 
-            // fonction qui permet d'afficher le tableau des donnees a modifier
-            function tableau(mois, annee) {
-                $.ajax({
-                    url: 'traitement/tableau_mes_donnees_mensuelles_a_modifier.php',
-                    type: 'POST',
-                    data: {
-                        moisVoirDonnees: mois,
-                        anneeVoirDonnees: annee
-                    },
-                    dataType: 'html',
-                    success: function (response) {
-                        console.log(response);
-                        document.getElementById("tableau_voir_mes_donnees").innerHTML = response
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    },
-
-                });
-            }
-            // Fin de la fonction qui permet d'afficher le tableau des donnees a modifier
 
             $('#btnImporterDonneesExcel').click(function () {
                 event.preventDefault()
@@ -616,7 +677,6 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                 });
             });
 
-
             $("#statistiquesparnature").click(function () {
                 event.preventDefault();
                 $("#modalVoirStatsGloblesParNature").modal("show");
@@ -651,6 +711,13 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                     alert('Veuillez choisir une année ')
                 }
             })
+
+
+
+
+
+
+
 
         })
     </script>

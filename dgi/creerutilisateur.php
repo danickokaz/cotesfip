@@ -8,6 +8,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
   utilisateur.token_utilisateur,
   utilisateur.pseudo,
   utilisateur.id,
+    utilisateur.id_role,
 utilisateur.id_service_pourvoyeur,
   service_pourvoyeur.abreviation as service_utilisateur,
   role_utilisateur.libelle_role as role_utilisateur,
@@ -27,6 +28,8 @@ utilisateur.id_service_pourvoyeur,
     $role_utilisateur = $donneesUtilisateur->role_utilisateur;
     $id_service_pourvoyeur = $donneesUtilisateur->id_service_pourvoyeur;
     $centre_perception = $donneesUtilisateur->centre_perception;
+    $id_role = $donneesUtilisateur->id_role;
+
 
 
     $req = database()->prepare("SELECT * FROM province WHERE id_service=?");

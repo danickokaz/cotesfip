@@ -259,8 +259,41 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
 
                                         </div>
                                     </div>
-                                </div>
 
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="configuration">Choisir la configuration des provinces</label>
+                                            <select class="form-control" id="configuration" name="configuration">
+                                                <option value="">Veuillez choisir la configuration des provinces</option>
+                                                
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="province">Choisir la province</label>
+                                            <select class="form-control" id="province" name="province">
+                                                <option value="">Veuillez choisir une province</option>
+                                                
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="centre_perception">Choisir le centre de perception</label>
+                                            <select class="form-control" id="centre_perception" name="centre_perception">
+                                                <option value="">Veuillez choisir une province</option>
+                                                
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-info mb-3" id="btnVoirDonnees">Afficher</button>
                             </form>
                         </div>
                     </div>
@@ -405,7 +438,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
     <!-- End custom js for this page-->
     <script>
         $(document).ready(function () {
-
+            selectConfigurations()
             $(".importerDonneesExcel").click(function () {
                 event.preventDefault();
 
@@ -418,7 +451,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                 $("#btnVoirDonnees").text('Chargement...')
                 $("#btnVoirDonnees").prop('disabled', true);
                 $.ajax({
-                    url: 'traitement/tableau_mes_donnees_mensuelles.php',
+                    url: 'traitement/tableau_mes_donnees_mensuelles_a_valider.php',
                     type: 'POST',
                     data: $("#formualireVoirDonnees").serialize(),
                     dataType: 'html',
@@ -437,117 +470,225 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                 });
             });
 
-            $('#moisVoirDonnees, #anneeVoirDonnees').on('change', function () {
-                var mois = $('#moisVoirDonnees').val();
-                var annee = $('#anneeVoirDonnees').val();
-
-                if (mois && annee) {
-
-                    tableau(mois, annee)
-
-                } else {
-
-                    Alert('Veuillez remplir les deux informations')
+            // recuperer les differentes configurations des provinces dans la base de donnees
+            function selectConfigurations(){
+                $.ajax({
+                url: 'traitement/selectConfigurations.php',
+                method: 'POST',
+                dataType: 'html',
+                error: function(){
+                    alert('Erreur lors de la récupération des configurations des provinces');
+                },
+                success: function(data){
+                    $("#configuration").html(data);
                 }
             })
+            }
+            //Fin de la recuperation des differentes configurations des provinces dans la base de donnees
 
-            $(document).on('click', '.btnModifierMesDonnees', function () {
-
-                var mois = $('#moisVoirDonnees').val();
-                var annee = $('#anneeVoirDonnees').val();
-                var id_modifier = $(this).attr('id');
-                $("#id_modifier").val(id_modifier)
+            $("#configuration").change(function(){
+                var id_configuration = $(this).val();
 
                 $.ajax({
-                    url: 'traitement/recuper_titre_par_id.php',
+                    url: 'traitement/selectProvinces.php',
                     method: 'POST',
-                    data: {
-                        id_modifier: id_modifier
-                    },
+                    data: {id_configuration: id_configuration},
                     dataType: 'html',
-                    success: function (response) {
-                        console.log(response);
-                        $("#titre").html(response)
-
-
-                    },
                     error: function () {
-                        alert('Erreur');
+                        alert('Erreur lors de la récupération des provinces');
+                    },
+                    success: function (data) {
+                        $("#province").html(data);
                     }
                 })
-
-                $.ajax({
-                    url: 'traitement/recuper_champs_prevision_realisation_par_id.php',
-                    method: 'POST',
-                    data: {
-                        id_modifier: id_modifier
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                        console.log(response);
-                        $("#previsionModifier").val(response.prevision)
-                        $("#realisationModifier").val(response.realisation)
-
-                        $("#modalModifierDonnees").modal("show");
-
-
-                    },
-                    error: function () {
-                        alert('Erreur');
-                    }
-                })
-
-
             })
 
 
-            $("#formulaireModifierDonnees").submit(function () {
-                event.preventDefault()
-
-                $("#btnModifierDonnees").text('Chargement...')
-                $("#btnModifierDonnees").prop('disabled', true);
+            $("#province").change(function(){
+                var id_province = $(this).val();
 
                 $.ajax({
-                    url: 'traitement/modifier_mes_donnees.php',
-                    type: 'POST',
-                    data: $("#formulaireModifierDonnees").serialize(),
+                    url: 'traitement/selectCentre.php',
+                    method: 'POST',
+                    data: {id_province: id_province},
+                    dataType: 'html',
+                    error: function () {
+                        alert('Erreur lors de la récupération des provinces');
+                    },
+                    success: function (data) {
+                        $("#centre_perception").html(data);
+                    }
+                })
+            })
+
+            
+
+            $(document).on('click','.validerDonneesParDep', function(){
+                event.preventDefault();
+                var id_valider = $(this).attr('id');
+
+                $.ajax({
+                    url: 'traitement/validerDonneesParDep.php',
+                    method: 'POST',
+                    data: {
+                        id_valider: id_valider
+                    },
                     dataType: 'text',
                     success: function (response) {
                         console.log(response);
-                        if (response == 'success') {
-                            // alert(response);
 
-                            Swal.fire({
-                                title: "Operation reussie!",
-                                text: "Donnees modifiees",
-                                icon: "success"
-                            });
+                        if(response == "Success"){
                             var mois = $("#moisVoirDonnees").val()
                             var annee = $("#anneeVoirDonnees").val()
-                            tableau(mois, annee)
-                            $("#modalModifierDonnees").modal("hide");
-                        } else {
-                            alert(response.message);
+                            var centre_perception = $("#centre_perception").val()
+                            tableau(mois, annee,centre_perception)
+                        }else{
+                            alert('Erreur lors de la validation des données');
+
                         }
+                        
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        alert('Erreur');
+                    }
+                })
+                
+            })
+
+
+            $(document).on('click','.validerDonneesParAdminService', function(){
+                event.preventDefault();
+                var id_valider = $(this).attr('id');
+
+                $.ajax({
+                    url: 'traitement/validerDonneesParAdminService.php',
+                    method: 'POST',
+                    data: {
+                        id_valider: id_valider
+                    },
+                    dataType: 'text',
+                    success: function (response) {
+                        console.log(response);
+
+                        if(response == "Success"){
+                            var mois = $("#moisVoirDonnees").val()
+                            var annee = $("#anneeVoirDonnees").val()
+                            var centre_perception = $("#centre_perception").val()
+                            tableau(mois, annee,centre_perception)
+                        }else{
+                            alert('Erreur lors de la validation des données');
+
+                        }
+                        
                     },
                     error: function () {
                         alert('Erreur');
-                    },
-                    complete: function () {
-                        $("#btnModifierDonnees").text('Modifier')
-                        $("#btnModifierDonnees").prop('disabled', false);
                     }
                 })
+                
             })
 
+            
+
+            // $(document).on('click', '.btnModifierMesDonnees', function () {
+
+            //     var mois = $('#moisVoirDonnees').val();
+            //     var annee = $('#anneeVoirDonnees').val();
+            //     var id_modifier = $(this).attr('id');
+            //     $("#id_modifier").val(id_modifier)
+
+            //     $.ajax({
+            //         url: 'traitement/recuper_titre_par_id.php',
+            //         method: 'POST',
+            //         data: {
+            //             id_modifier: id_modifier
+            //         },
+            //         dataType: 'html',
+            //         success: function (response) {
+            //             console.log(response);
+            //             $("#titre").html(response)
+
+
+            //         },
+            //         error: function () {
+            //             alert('Erreur');
+            //         }
+            //     })
+
+            //     $.ajax({
+            //         url: 'traitement/recuper_champs_prevision_realisation_par_id.php',
+            //         method: 'POST',
+            //         data: {
+            //             id_modifier: id_modifier
+            //         },
+            //         dataType: 'json',
+            //         success: function (response) {
+            //             console.log(response);
+            //             $("#previsionModifier").val(response.prevision)
+            //             $("#realisationModifier").val(response.realisation)
+
+            //             $("#modalModifierDonnees").modal("show");
+
+
+            //         },
+            //         error: function () {
+            //             alert('Erreur');
+            //         }
+            //     })
+
+
+            // })
+
+
+            // $("#formulaireModifierDonnees").submit(function () {
+            //     event.preventDefault()
+
+            //     $("#btnModifierDonnees").text('Chargement...')
+            //     $("#btnModifierDonnees").prop('disabled', true);
+
+            //     $.ajax({
+            //         url: 'traitement/modifier_mes_donnees.php',
+            //         type: 'POST',
+            //         data: $("#formulaireModifierDonnees").serialize(),
+            //         dataType: 'text',
+            //         success: function (response) {
+            //             console.log(response);
+            //             if (response == 'success') {
+            //                 // alert(response);
+
+            //                 Swal.fire({
+            //                     title: "Operation reussie!",
+            //                     text: "Donnees modifiees",
+            //                     icon: "success"
+            //                 });
+            //                 var mois = $("#moisVoirDonnees").val()
+            //                 var annee = $("#anneeVoirDonnees").val()
+            //                 tableau(mois, annee)
+            //                 $("#modalModifierDonnees").modal("hide");
+            //             } else {
+            //                 alert(response.message);
+            //             }
+            //         },
+            //         error: function () {
+            //             alert('Erreur');
+            //         },
+            //         complete: function () {
+            //             $("#btnModifierDonnees").text('Modifier')
+            //             $("#btnModifierDonnees").prop('disabled', false);
+            //         }
+            //     })
+            // })
+
             // fonction qui permet d'afficher le tableau des donnees a modifier
-            function tableau(mois, annee) {
+            function tableau(mois, annee, centre_perception) {
                 $.ajax({
-                    url: 'traitement/tableau_mes_donnees_mensuelles_a_modifier.php',
+                    url: 'traitement/tableau_mes_donnees_mensuelles_a_valider.php',
                     type: 'POST',
                     data: {
                         moisVoirDonnees: mois,
-                        anneeVoirDonnees: annee
+                        anneeVoirDonnees: annee,
+                        centre_perception: centre_perception
                     },
                     dataType: 'html',
                     success: function (response) {

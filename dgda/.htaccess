@@ -6,6 +6,10 @@ php_value error_reporting 32767
 
 RewriteRule ^accueil$ accueil.php
 RewriteRule ^connexion$ index.php
+RewriteRule ^affectationsecteur$ affectationsecteur.php
+RewriteRule ^affectationtype$ affectationtype.php
+RewriteRule ^deconnexion$ deconnexion.php
+
 RewriteRule ^ajouterprevision$ ajouterprevision.php
 RewriteRule ^ajouterrealisation$ ajouterrealisation.php
 RewriteRule ^consulterprevision$ consulterprevision.php
@@ -26,10 +30,3 @@ RewriteRule ^validerdonnees$ validerdonnees.php
 
 RewriteRule ^globalesnature/([0-9]+)$ globalesnature.php?annee=$1
 RewriteRule ^globalesprovince/([0-9]+)$ globalesprovince.php?annee=$1
-
-
-
-
-
-
-

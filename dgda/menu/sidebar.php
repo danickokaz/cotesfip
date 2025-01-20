@@ -85,14 +85,14 @@
           <?php if($id_role==1): ?>
           <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#importation" aria-expanded="false" aria-controls="ui-basic">
-              <i class="fa fa-upload  menu-icon"></i>
-              <span class="menu-title">Importation technique</span>
+              <i class="fa fa-plus  menu-icon"></i>
+              <span class="menu-title">Afféctation technique</span>
               <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="importation">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="importerprovince"> Province</a></li>
-                <li class="nav-item"> <a class="nav-link" href="importercentre">Centre de perception</a></li>
+                <li class="nav-item"> <a class="nav-link" href="affectationsecteur">Secteurs d'activités</a></li>
+                <li class="nav-item"> <a class="nav-link" href="affectationtype">Types et catégorie</a></li>
               </ul>
             </div>
           </li>

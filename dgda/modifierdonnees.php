@@ -1,21 +1,22 @@
 <?php
 session_start();
 require __DIR__.'../../settings/bdd.php';
-if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
-  $session = htmlspecialchars($_SESSION['visa']);
+if(isset($_SESSION['access']) and !empty($_SESSION['access'])){
+  $session = htmlspecialchars($_SESSION['access']);
 
   $req = database()->prepare("SELECT 
-  utilisateur.token_utilisateur,
-  utilisateur.pseudo,
-  utilisateur.id,
-    utilisateur.id_role,
+  dgda_utilisateur.token_utilisateur,
+  dgda_utilisateur.pseudo,
+  dgda_utilisateur.id,
+  dgda_utilisateur.id_role,
+  dgda_utilisateur.id_service_pourvoyeur,
   service_pourvoyeur.abreviation as service_utilisateur,
   role_utilisateur.libelle_role as role_utilisateur,
-  dgi_centre_perception.libelle_centre as centre_perception
-  FROM utilisateur 
-  INNER JOIN service_pourvoyeur ON utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
-  INNER JOIN role_utilisateur ON utilisateur.id_role = role_utilisateur.id
-  LEFT JOIN dgi_centre_perception ON  dgi_centre_perception.id = utilisateur.id_centre_perception
+  dgda_centre_perception.libelle_centre_perception as centre_perception
+  FROM dgda_utilisateur 
+  INNER JOIN service_pourvoyeur ON dgda_utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
+  INNER JOIN role_utilisateur ON dgda_utilisateur.id_role = role_utilisateur.id
+  LEFT JOIN dgda_centre_perception ON  dgda_centre_perception.id = dgda_utilisateur.id_centre_perception
   WHERE token_utilisateur=?");
   $req->execute([$session]);
 
@@ -25,6 +26,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
     $pseudo = $donneesUtilisateur->pseudo;
     $service_utilisateur  = $donneesUtilisateur->service_utilisateur;
     $role_utilisateur = $donneesUtilisateur->role_utilisateur;
+    $id_service_pourvoyeur = $donneesUtilisateur->id_service_pourvoyeur;
     $centre_perception = $donneesUtilisateur->centre_perception;
     $id_role = $donneesUtilisateur->id_role;
 
