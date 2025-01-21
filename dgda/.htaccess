@@ -30,3 +30,4 @@ RewriteRule ^validerdonnees$ validerdonnees.php
 
 RewriteRule ^globalesnature/([0-9]+)$ globalesnature.php?annee=$1
 RewriteRule ^globalesprovince/([0-9]+)$ globalesprovince.php?annee=$1
+RewriteRule ^globalescentre/([0-9]+)$ globalescentre.php?annee=$1
