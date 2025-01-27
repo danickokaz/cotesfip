@@ -52,6 +52,9 @@ body {
 #logo3 {
     background-image: url('images/logo-dgrad.png'); /* Remplace par le chemin de ton troisième logo */
 }
+#logo4 {
+    background-image: url('images/finances.jpeg'); /* Remplace par le chemin de ton troisième logo */
+}
 
 </style>
 
@@ -59,7 +62,9 @@ body {
     <div class="logo-container">
         <a href="dgi/"><div class="logo" id="logo1"></div></a>
         <a href="dgda/"><div class="logo" id="logo2"></div></a>
-        <a href="dgrad"><div class="logo" id="logo3"></div></a>
+        <a href="dgrad/"><div class="logo" id="logo3"></div></a>
+        <a href="cabinet"><div class="logo" id="logo4"></div></a>
+
     </div>
 </body>
 

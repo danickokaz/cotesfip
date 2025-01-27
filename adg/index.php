@@ -1,10 +1,10 @@
 <?php
 session_start();
 require __DIR__.'../../settings/bdd.php';
-if(isset($_SESSION['access']) and !empty($_SESSION['access'])){
-  $session = htmlspecialchars($_SESSION['access']);
+if(isset($_SESSION['kedadaje']) and !empty($_SESSION['kedadaje'])){
+  $session = htmlspecialchars($_SESSION['kedadaje']);
 
-  $req = database()->prepare("SELECT token_utilisateur FROM dgda_utilisateur WHERE token_utilisateur=?");
+  $req = database()->prepare("SELECT token_admin FROM administrateur WHERE token_utilisateur=?");
   $req->execute([$session]);
 
   if($req->rowCount() == 1){

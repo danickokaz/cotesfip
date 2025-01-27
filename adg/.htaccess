@@ -1,0 +1,8 @@
+RewriteEngine On
+
+php_flag display_errors on
+php_value error_reporting 32767
+
+RewriteRule ^accueil$ accueil.php
+RewriteRule ^connexion$ index.php
+RewriteRule ^deconnexion$ deconnexion.php
