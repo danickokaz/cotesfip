@@ -1,0 +1,37 @@
+RewriteEngine On
+
+php_flag display_errors on
+php_value error_reporting 32767
+
+
+RewriteRule ^accueil$ accueil.php
+RewriteRule ^connexion$ index.php
+RewriteRule ^ajouterprevision$ ajouterprevision.php
+RewriteRule ^ajouterrealisation$ ajouterrealisation.php
+RewriteRule ^consulterprevision$ consulterprevision.php
+RewriteRule ^consulterrealisation$ consulterrealisation.php
+RewriteRule ^modifierdonnees$ modifierdonnees.php
+RewriteRule ^statistiquesparnature$ statistiquesparnature.php
+RewriteRule ^statistiquesparprovince$ statistiquesparprovince.php
+RewriteRule ^deconnexion$ deconnexion.php
+RewriteRule ^utilisateurcentre$ utilisateurcentre.php
+RewriteRule ^utilisateurprovince$ utilisateurprovince.php
+RewriteRule ^importerserviceassiette$ importerserviceassiette.php
+RewriteRule ^importeractegenerateur$ importeractegenerateur.php
+RewriteRule ^creerutilisateur$ creerutilisateur.php
+RewriteRule ^affecterutilisateur$ affecterutilisateur.php
+RewriteRule ^consulterdonnees$ consulterdonnees.php
+RewriteRule ^validerdonnees$ validerdonnees.php
+RewriteRule ^importeractegenerateur$ importeractegenerateur.php
+RewriteRule ^importercategorieactegenerateur$ importercategorieactegenerateur.php
+
+
+RewriteRule ^globalesnature/([0-9]+)$ globalesnature.php?annee=$1
+RewriteRule ^globalesprovince/([0-9]+)$ globalesprovince.php?annee=$1
+
+
+
+
+
+
+
