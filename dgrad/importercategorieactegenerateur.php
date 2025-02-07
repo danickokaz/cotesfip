@@ -208,9 +208,9 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
 
                                         <div class="form-group mb-2">
                                             <label for="exerciceM">Choisir l'exercice</label>
-                                            
+
                                             <select class="form-control" id="exerciceM" name="exerciceM">
-                                            <option value="">Veuillez choisir</option>
+                                                <option value="">Veuillez choisir</option>
                                                 <?php for($i=2024;$i<=date('Y');$i++): ?>
                                                 <option value="<?= $i ?>"><?= $i ?></option>
                                                 <?php endfor; ?>
@@ -218,7 +218,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                                         </div>
                                         <div class="form-group mb-2">
                                             <select name="serviceM" id="serviceM" class="form-control">
-                                                
+
                                             </select>
                                         </div>
 
@@ -321,9 +321,21 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                                                 <div class="form-group">
                                                     <label for="annee">Choisir l'annee</label>
                                                     <select class="form-control" id="annee" name="annee">
+                                                    <option value="">Veuillez choisir une annee</option>
                                                         <?php for($i=2024;$i<=date('Y');$i++): ?>
                                                         <option value="<?= $i ?>"><?= $i ?></option>
                                                         <?php endfor; ?>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="services">Choisir le service</label>
+                                                    <select class="form-control" id="services" name="services">
+
                                                     </select>
 
                                                 </div>
@@ -463,7 +475,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                 }
             })
 
-            
+
 
             $("#exerciceM").change(function () {
                 var exerciceM = $(this).val();
@@ -575,7 +587,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                     data: {
                         ids: selectedIds,
                         service: service,
-                        exercice:exercice
+                        exercice: exercice
                     }, // Données envoyées
                     success: function (response) {
                         console.log('Réponse brute du serveur:',
@@ -714,6 +726,24 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                 } else {
                     alert('Veuillez choisir une année ')
                 }
+            })
+
+
+            $("#annee").change(function(){
+                var exerciceM = $(this).val();
+                
+                $.ajax({
+                    url: 'traitement/selectServicesParExercice.php',
+                    method: 'POST',
+                    data: {exerciceM: exerciceM},
+                    error: function(error){
+                        console.log("Erreur lors de la requête"+error);
+                    },
+                    dataType: 'html',
+                    success: function(response){
+                    $("#services").html(response);
+                    }
+                })
             })
 
 

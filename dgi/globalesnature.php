@@ -193,6 +193,7 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                     <?php foreach ($mois_noms as $id => $mois): ?>
                         <th colspan="3" class="text-center"><?= $mois ?></th>
                     <?php endforeach; ?>
+                    <th colspan="3" class="text-center">Cumul</th>
                 </tr>
                 <tr>
                     <?php foreach ($mois_noms as $id => $mois): ?>
@@ -200,37 +201,77 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                         <th>Réalisation</th>
                         <th>Taux (%)</th>
                     <?php endforeach; ?>
+                    <th>Prévision</th>
+                    <th>Réalisation</th>
+                    <th>Taux (%)</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($data_grouped_by_type as $type => $type_data): ?>
                     <tr class="table-secondary">
                         <td colspan="2" align="center"><strong><?= htmlspecialchars($type ?: '') ?></strong></td>
+                        <?php
+                        $cumul_prevision = 0;
+                        $cumul_realisation = 0;
+                        ?>
                         <?php foreach ($mois_noms as $id => $mois): ?>
                             <td class="text-center"><?= number_format($type_data['total_prevision'][$id], 2, ',', '.') ?></td>
                             <td class="text-center"><?= number_format($type_data['total_realisation'][$id], 2, ',', '.') ?></td>
                             <td class="text-center"><?= $type_data['total_prevision'][$id] > 0 
-                                ? number_format(($type_data['total_realisation'][$id] / $type_data['total_prevision'][$id]) * 100, 2) 
-                                : 0 ?></td>
+                                ? number_format(($type_data['total_realisation'][$id] / $type_data['total_prevision'][$id]) * 100, 2) . "%" 
+                                : "0%" ?></td>
+
+                            <?php
+                            // Calculer le cumul pour chaque mois
+                            $cumul_prevision += $type_data['total_prevision'][$id];
+                            $cumul_realisation += $type_data['total_realisation'][$id];
+                            ?>
                         <?php endforeach; ?>
+
+                        <!-- Affichage des cumuls -->
+                        <td class="text-center"><?= number_format($cumul_prevision, 2, ',', '.') ?></td>
+                        <td class="text-center"><?= number_format($cumul_realisation, 2, ',', '.') ?></td>
+                        <td class="text-center">
+                            <?= $cumul_prevision > 0 
+                                ? number_format(($cumul_realisation / $cumul_prevision) * 100, 2) . "%" 
+                                : "0%" ?>
+                        </td>
                     </tr>
 
                     <?php foreach ($type_data['categories'] as $categorie => $categorie_data): ?>
                         <tr class="table-info">
                             <td colspan="2" align="center"><strong><?= htmlspecialchars($categorie) ?></strong></td>
+                            <?php
+                            $cumul_prevision = 0;
+                            $cumul_realisation = 0;
+                            ?>
                             <?php foreach ($mois_noms as $id => $mois): ?>
                                 <td class="text-center"><?= number_format($categorie_data['total_prevision'][$id], 2, ',', '.') ?></td>
                                 <td class="text-center"><?= number_format($categorie_data['total_realisation'][$id], 2, ',', '.') ?></td>
                                 <td class="text-center"><?= $categorie_data['total_prevision'][$id] > 0 
-                                    ? number_format(($categorie_data['total_realisation'][$id] / $categorie_data['total_prevision'][$id]) * 100, 2) 
-                                    : 0 ?></td>
+                                    ? number_format(($categorie_data['total_realisation'][$id] / $categorie_data['total_prevision'][$id]) * 100, 2) . "%" 
+                                    : "0%" ?></td>
+
+                                <?php
+                                // Calculer le cumul pour chaque mois
+                                $cumul_prevision += $categorie_data['total_prevision'][$id];
+                                $cumul_realisation += $categorie_data['total_realisation'][$id];
+                                ?>
                             <?php endforeach; ?>
+
+                            <!-- Affichage des cumuls -->
+                            <td class="text-center"><?= number_format($cumul_prevision, 2, ',', '.') ?></td>
+                            <td class="text-center"><?= number_format($cumul_realisation, 2, ',', '.') ?></td>
+                            <td class="text-center">
+                                <?= $cumul_prevision > 0 
+                                    ? number_format(($cumul_realisation / $cumul_prevision) * 100, 2) . "%" 
+                                    : "0%" ?>
+                            </td>
                         </tr>
 
                         <?php foreach ($categorie_data['nature_recettes'] as $code => $details): ?>
                             <tr>
                                 <td><?= htmlspecialchars($code ?: 'Non défini') ?></td>
-                                <!-- Affichage en italique pour les deux natures spécifiques -->
                                 <td>
                                     <?= 
                                         in_array($details['nature_recette'], ['Impôt sur les bénéfices et profits des petites entreprises', 'Impôt sur les bénéfices et profits des micro-entreprises'])
@@ -238,6 +279,10 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                         : htmlspecialchars($details['nature_recette'])
                                     ?>
                                 </td>
+                                <?php
+                                $cumul_prevision = 0;
+                                $cumul_realisation = 0;
+                                ?>
                                 <?php foreach ($mois_noms as $id => $mois): ?>
                                     <?php 
                                     $prevision = isset($details['mois'][$id]) ? $details['mois'][$id]['prevision'] : 0;
@@ -246,8 +291,23 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                                     ?>
                                     <td class="text-center"><?= number_format($prevision, 2, ',', '.') ?></td>
                                     <td class="text-center"><?= number_format($realisation, 2, ',', '.') ?></td>
-                                    <td class="text-center"><?= number_format($taux, 2) ?></td>
+                                    <td class="text-center"><?= number_format($taux, 2) . "%" ?></td>
+
+                                    <?php
+                                    // Calculer le cumul pour chaque mois
+                                    $cumul_prevision += $prevision;
+                                    $cumul_realisation += $realisation;
+                                    ?>
                                 <?php endforeach; ?>
+
+                                <!-- Affichage des cumuls -->
+                                <td class="text-center"><?= number_format($cumul_prevision, 2, ',', '.') ?></td>
+                                <td class="text-center"><?= number_format($cumul_realisation, 2, ',', '.') ?></td>
+                                <td class="text-center">
+                                    <?= $cumul_prevision > 0 
+                                        ? number_format(($cumul_realisation / $cumul_prevision) * 100, 2) . "%" 
+                                        : "0%" ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endforeach; ?>
@@ -259,9 +319,14 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                         <td class="text-center"><?= number_format($totaux['total_prevision_exclu'][$id], 2, ',', '.') ?></td>
                         <td class="text-center"><?= number_format($totaux['total_realisation_exclu'][$id], 2, ',', '.') ?></td>
                         <td class="text-center"><?= $totaux['total_prevision_exclu'][$id] > 0 
-                            ? number_format(($totaux['total_realisation_exclu'][$id] / $totaux['total_prevision_exclu'][$id]) * 100, 2) 
-                            : 0 ?></td>
+                            ? number_format(($totaux['total_realisation_exclu'][$id] / $totaux['total_prevision_exclu'][$id]) * 100, 2) . "%" 
+                            : "0%" ?></td>
                     <?php endforeach; ?>
+                    <td class="text-center"><?= number_format(array_sum($totaux['total_prevision_exclu']), 2, ',', '.') ?></td>
+                    <td class="text-center"><?= number_format(array_sum($totaux['total_realisation_exclu']), 2, ',', '.') ?></td>
+                    <td class="text-center"><?= array_sum($totaux['total_prevision_exclu']) > 0
+                        ? number_format((array_sum($totaux['total_realisation_exclu']) / array_sum($totaux['total_prevision_exclu'])) * 100, 2) . "%" 
+                        : "0%" ?></td>
                 </tr>
 
                 <tr class="table-success">
@@ -270,12 +335,19 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                         <td class="text-center"><?= number_format($totaux['total_prevision_general'][$id], 2, ',', '.') ?></td>
                         <td class="text-center"><?= number_format($totaux['total_realisation_general'][$id], 2, ',', '.') ?></td>
                         <td class="text-center"><?= $totaux['total_prevision_general'][$id] > 0 
-                            ? number_format(($totaux['total_realisation_general'][$id] / $totaux['total_prevision_general'][$id]) * 100, 2) 
-                            : 0 ?></td>
+                            ? number_format(($totaux['total_realisation_general'][$id] / $totaux['total_prevision_general'][$id]) * 100, 2) . "%" 
+                            : "0%" ?></td>
                     <?php endforeach; ?>
+                    <td class="text-center"><?= number_format(array_sum($totaux['total_prevision_general']), 2, ',', '.') ?></td>
+                    <td class="text-center"><?= number_format(array_sum($totaux['total_realisation_general']), 2, ',', '.') ?></td>
+                    <td class="text-center"><?= array_sum($totaux['total_prevision_general']) > 0
+                        ? number_format((array_sum($totaux['total_realisation_general']) / array_sum($totaux['total_prevision_general'])) * 100, 2) . "%" 
+                        : "0%" ?></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </body>
 </html>
+
+

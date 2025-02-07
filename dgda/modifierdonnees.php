@@ -502,6 +502,8 @@ if(isset($_SESSION['access']) and !empty($_SESSION['access'])){
 
             })
 
+            
+
 
             $("#formulaireModifierDonnees").submit(function () {
                 event.preventDefault()

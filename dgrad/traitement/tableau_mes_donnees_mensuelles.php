@@ -39,9 +39,9 @@ if (isset($_SESSION['jlk']) && !empty($_SESSION['jlk'])) {
         if (isset($_POST['moisVoirDonnees'], $_POST['anneeVoirDonnees'],$_POST['services']) && !empty($_POST['moisVoirDonnees']) && !empty($_POST['anneeVoirDonnees']) && !empty($_POST['services'])) {
             $mois = htmlspecialchars($_POST['moisVoirDonnees']);
             $annee = htmlspecialchars($_POST['anneeVoirDonnees']);
-            $services = htmlspecialchars($_POST['services']);
+            $services = htmlspecialchars(string: $_POST['services']);
 
-            function afficherTableau($services,$mois, $annee) {
+            function afficherTableau($services,$id_province_utilisateur,$mois, $annee) {
                 $bdd = database();
 
                 // Requête pour récupérer les données structurées
@@ -55,19 +55,19 @@ if (isset($_SESSION['jlk']) && !empty($_SESSION['jlk'])) {
                         s.realisation
                     FROM dgrad_statistique s
                     LEFT JOIN dgrad_categorie_acte_generateur ca ON s.id_categorie_acte = ca.id
-                    WHERE s.id_service_assiette = ? AND s.mois = ? AND s.annee = ?
+                    WHERE s.id_service_assiette = ? AND s.id_province=? AND s.mois = ? AND s.annee = ?
                     ORDER BY 
                         
                         s.id_ordre ASC
                 ";
 
                 $stmt = $bdd->prepare($sql);
-                $stmt->execute([$services,$mois, $annee]);
+                $stmt->execute([$services,$id_province_utilisateur,$mois, $annee]);
                 $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // Génération du tableau HTML
                 echo "<table width='100%' border='1'>";
-                echo "<thead><tr><th>Code</th><th>Nature de Recette</th><th>Prévision</th><th>Réalisation</th>Taux de realisation</th></tr></thead><tbody>";
+                echo "<thead><tr><th>Code</th><th>Acte generateur</th><th>Prévision</th><th>Réalisation</th><th>Taux realisation</th></tr></thead><tbody>";
 
                 $typeCourant = null;
                 $categorieCourante = null;
@@ -121,7 +121,7 @@ if (isset($_SESSION['jlk']) && !empty($_SESSION['jlk'])) {
                 echo "</tbody></table>";
             }
 
-            afficherTableau($services,$mois, $annee);
+            afficherTableau($services,$id_province_utilisateur,$mois, $annee);
         }
     }
 }

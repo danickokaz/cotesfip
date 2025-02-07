@@ -136,8 +136,9 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                     <th>Province</th>
                     <th>Centre</th>
                     <?php foreach ($mois_noms as $mois): ?>
-                        <th colspan="2" class="text-center"><?= $mois ?></th>
+                        <th colspan="3" class="text-center"><?= $mois ?></th>
                     <?php endforeach; ?>
+                    <th colspan="3" class="text-center">Cumul</th>
                 </tr>
                 <tr>
                     <th></th>
@@ -145,52 +146,101 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                     <?php foreach ($mois_noms as $mois): ?>
                         <th>Prévision</th>
                         <th>Réalisation</th>
+                        <th>Taux (%)</th>
                     <?php endforeach; ?>
+                    <th>Prévision</th>
+                    <th>Réalisation</th>
+                    <th>Taux (%)</th>
                 </tr>
             </thead>
             <tbody>
                 <?php 
                 $totaux_generaux = array_fill(1, 12, ['prevision' => 0, 'realisation' => 0]);
+                $total_cumul_prevision = 0;
+                $total_cumul_realisation = 0;
+
                 foreach ($data_grouped as $province => $centres): 
                 ?>
                     <?php 
                     $sous_total_prevision = array_fill(1, 12, 0);
                     $sous_total_realisation = array_fill(1, 12, 0);
+                    $cumul_prevision_province = 0;
+                    $cumul_realisation_province = 0;
+
                     foreach ($centres as $centre => $mois_data): ?>
                         <tr>
                             <td><?= htmlspecialchars($province) ?></td>
                             <td><?= htmlspecialchars($centre) ?></td>
-                            <?php foreach ($mois_noms as $id => $mois): 
+                            <?php 
+                            $cumul_prevision_centre = 0;
+                            $cumul_realisation_centre = 0;
+
+                            foreach ($mois_noms as $id => $mois): 
                                 $prevision = $mois_data[$id]['prevision'] ?? 0;
                                 $realisation = $mois_data[$id]['realisation'] ?? 0;
+                                $taux_realisation = ($prevision > 0) ? ($realisation / $prevision) * 100 : 0;
+
                                 $sous_total_prevision[$id] += $prevision;
                                 $sous_total_realisation[$id] += $realisation;
+
+                                $cumul_prevision_centre += $prevision;
+                                $cumul_realisation_centre += $realisation;
                             ?>
                                 <td class="text-end"><?= number_format($prevision, 2, ',', '.') ?></td>
                                 <td class="text-end"><?= number_format($realisation, 2, ',', '.') ?></td>
+                                <td class="text-end"><?= number_format($taux_realisation, 2, ',', '.') ?>%</td>
                             <?php endforeach; ?>
+
+                            <!-- Cumul par Centre -->
+                            <td class="text-end"><strong><?= number_format($cumul_prevision_centre, 2, ',', '.') ?></strong></td>
+                            <td class="text-end"><strong><?= number_format($cumul_realisation_centre, 2, ',', '.') ?></strong></td>
+                            <td class="text-end"><strong><?= number_format(($cumul_prevision_centre > 0) ? ($cumul_realisation_centre / $cumul_prevision_centre) * 100 : 0, 2, ',', '.') ?>%</strong></td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php 
+                    $cumul_prevision_province += $cumul_prevision_centre;
+                    $cumul_realisation_province += $cumul_realisation_centre;
+                    endforeach; ?>
+
                     <tr class="table-warning">
                         <td colspan="2" align="center"><strong><?= htmlspecialchars($province) ?></strong></td>
                         <?php foreach ($mois_noms as $id => $mois): 
                             $totaux_generaux[$id]['prevision'] += $sous_total_prevision[$id];
                             $totaux_generaux[$id]['realisation'] += $sous_total_realisation[$id];
+                            $taux_sous_total = ($sous_total_prevision[$id] > 0) ? ($sous_total_realisation[$id] / $sous_total_prevision[$id]) * 100 : 0;
                         ?>
                             <td class="text-end"><strong><?= number_format($sous_total_prevision[$id], 2, ',', '.') ?></strong></td>
                             <td class="text-end"><strong><?= number_format($sous_total_realisation[$id], 2, ',', '.') ?></strong></td>
+                            <td class="text-end"><strong><?= number_format($taux_sous_total, 2, ',', '.') ?>%</strong></td>
                         <?php endforeach; ?>
+
+                        <!-- Cumul par Province -->
+                        <td class="text-end"><strong><?= number_format($cumul_prevision_province, 2, ',', '.') ?></strong></td>
+                        <td class="text-end"><strong><?= number_format($cumul_realisation_province, 2, ',', '.') ?></strong></td>
+                        <td class="text-end"><strong><?= number_format(($cumul_prevision_province > 0) ? ($cumul_realisation_province / $cumul_prevision_province) * 100 : 0, 2, ',', '.') ?>%</strong></td>
                     </tr>
-                <?php endforeach; ?>
+                <?php 
+                $total_cumul_prevision += $cumul_prevision_province;
+                $total_cumul_realisation += $cumul_realisation_province;
+                endforeach; ?>
+
                 <tr class="table-primary">
                     <td colspan="2" align="center"><strong>Total Général</strong></td>
-                    <?php foreach ($mois_noms as $id => $mois): ?>
+                    <?php foreach ($mois_noms as $id => $mois): 
+                        $taux_total_general = ($totaux_generaux[$id]['prevision'] > 0) ? ($totaux_generaux[$id]['realisation'] / $totaux_generaux[$id]['prevision']) * 100 : 0;
+                    ?>
                         <td class="text-end"><strong><?= number_format($totaux_generaux[$id]['prevision'], 2, ',', '.') ?></strong></td>
                         <td class="text-end"><strong><?= number_format($totaux_generaux[$id]['realisation'], 2, ',', '.') ?></strong></td>
+                        <td class="text-end"><strong><?= number_format($taux_total_general, 2, ',', '.') ?>%</strong></td>
                     <?php endforeach; ?>
+
+                    <!-- Cumul Général -->
+                    <td class="text-end"><strong><?= number_format($total_cumul_prevision, 2, ',', '.') ?></strong></td>
+                    <td class="text-end"><strong><?= number_format($total_cumul_realisation, 2, ',', '.') ?></strong></td>
+                    <td class="text-end"><strong><?= number_format(($total_cumul_prevision > 0) ? ($total_cumul_realisation / $total_cumul_prevision) * 100 : 0, 2, ',', '.') ?>%</strong></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </body>
 </html>
+

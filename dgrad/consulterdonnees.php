@@ -206,9 +206,21 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                                                 <div class="form-group">
                                                     <label for="annee">Choisir l'annee</label>
                                                     <select class="form-control" id="annee" name="annee">
+                                                        <option value="">Veuillez choisir une annee</option>
                                                         <?php for($i=2024;$i<=date('Y');$i++): ?>
                                                         <option value="<?= $i ?>"><?= $i ?></option>
                                                         <?php endfor; ?>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="servicesI">Choisir le service</label>
+                                                    <select class="form-control" id="servicesI" name="servicesI">
+
                                                     </select>
 
                                                 </div>
@@ -344,7 +356,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                                             <label for="services">Choisir le service</label>
                                             <select class="form-control" id="services" name="services">
                                                 <option value="">Veuillez choisir le service</option>
-                                                
+
                                             </select>
 
                                         </div>
@@ -357,9 +369,9 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                         </div>
                     </div>
 
-                   
-                        <div id="tableau_voir_mes_donnees"></div>
-                    
+
+                    <div id="tableau_voir_mes_donnees"></div>
+
 
                 </div>
                 <!-- content-wrapper ends -->
@@ -499,9 +511,28 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
             })
 
 
-            
 
-            $("#anneeVoirDonnees").change(function(){
+
+            $("#anneeVoirDonnees").change(function () {
+                var exerciceM = $(this).val();
+
+                $.ajax({
+                    url: 'traitement/selectServicesParExercice.php',
+                    method: 'POST',
+                    data: {
+                        exerciceM: exerciceM
+                    },
+                    error: function (error) {
+                        console.log("Erreur lors de la requête" + error);
+                    },
+                    dataType: 'html',
+                    success: function (response) {
+                        $("#services").html(response);
+                    }
+                })
+            })
+
+            $("#annee").change(function(){
                 var exerciceM = $(this).val();
                 
                 $.ajax({
@@ -513,7 +544,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                     },
                     dataType: 'html',
                     success: function(response){
-                    $("#services").html(response);
+                    $("#servicesI").html(response);
                     }
                 })
             })

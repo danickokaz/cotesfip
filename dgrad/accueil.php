@@ -281,21 +281,21 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
 
 
 
-          <div class="modal fade" id="modalVoirStatsGloblesParNature" tabindex="-1" role="dialog"
+          <div class="modal fade" id="modalVoirStatsGloblesParActeGenerateur" tabindex="-1" role="dialog"
             aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">STATISTIQUES GLOBALES PAR NATURE</h5>
+                  <ERA class="modal-title" id="exampleModalLabel">STATISTIQUES GLOBALES PAR ACTE GENERATEUR</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  <form id="formulaireVoirStatsGlobalesParNature" method="post">
+                  <form id="formulaireVoirStatsGlobalesParActeGenerateur" method="post">
                     <div class="form-group">
-                      <label for="anneeStatsGlobalesParNature">Choisir l'annee</label>
-                      <select class="form-control" id="anneeStatsGlobalesParNature" name="anneeStatsGlobalesParNature">
+                      <label for="anneeStatsGlobalesParActeGenerateur">Choisir l'annee</label>
+                      <select class="form-control" id="anneeStatsGlobalesParActeGenerateur" name="anneeStatsGlobalesParActeGenerateur">
                         <?php for($i=2024;$i<=date('Y');$i++): ?>
                         <option value="<?= $i ?>"><?= $i ?></option>
                         <?php endfor; ?>
@@ -460,9 +460,9 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
       });
 
 
-      $("#statistiquesparnature").click(function () {
+      $("#statistiquesparactegenerateur").click(function () {
         event.preventDefault();
-        $("#modalVoirStatsGloblesParNature").modal("show");
+        $("#modalVoirStatsGloblesParActeGenerateur").modal("show");
       })
 
       $("#statistiquesparprovince").click(function () {
@@ -471,13 +471,13 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
       })
 
 
-      $("#formulaireVoirStatsGlobalesParNature").submit(function () {
+      $("#formulaireVoirStatsGlobalesParActeGenerateur").submit(function () {
         event.preventDefault()
 
-        var annee = $("#anneeStatsGlobalesParNature").val();
+        var annee = $("#anneeStatsGlobalesParActeGenerateur").val();
 
         if (annee != "") {
-          location.href = "globalesnature/" + annee
+          location.href = "globalactegenerateur/" + annee
         } else {
           alert('Veuillez choisir une année ')
         }

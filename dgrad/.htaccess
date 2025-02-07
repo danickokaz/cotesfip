@@ -26,7 +26,7 @@ RewriteRule ^importeractegenerateur$ importeractegenerateur.php
 RewriteRule ^importercategorieactegenerateur$ importercategorieactegenerateur.php
 
 
-RewriteRule ^globalesnature/([0-9]+)$ globalesnature.php?annee=$1
+RewriteRule ^globalactegenerateur/([0-9]+)$ globalactegenerateur.php?annee=$1
 RewriteRule ^globalesprovince/([0-9]+)$ globalesprovince.php?annee=$1
 
 

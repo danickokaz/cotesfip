@@ -30,12 +30,6 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
     $libelle_province  = $donneesUtilisateur->libelle_province;
 
 
-    $req = database()->prepare(query: "SELECT * FROM dgrad_categorie_recette");
-    $req->execute();
-
-    if($req->rowCount() > 0){
-      $donnees = $req->fetchAll(PDO::FETCH_OBJ);
-    }
 
 
   }else{
@@ -51,54 +45,8 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
 <html lang="fr">
 
 <head>
-    <?php require 'header/header.php'; ?>
-    <style>
-        .card {
-            max-width: 500px;
-            margin: 0 auto;
-            border-radius: 8px;
-            border: 1px solid #eaeaea;
-        }
-
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .form-control {
-            height: calc(2.5rem + 2px);
-            font-size: 1rem;
-            border-radius: 6px;
-            border: 1px solid #ced4da;
-            transition: border-color 0.2s ease-in-out;
-        }
-
-        .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            font-size: 1.2rem;
-            padding: 10px 30px;
-            border-radius: 6px;
-        }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
-        }
-
-        h3 {
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-    </style>
-
-
-
+    <!-- Required meta tags -->
+    <?php require 'header/header.php' ?>
 </head>
 
 <body>
@@ -112,18 +60,62 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                 </button>
                 <ul class="navbar-nav mr-lg-2">
                     <li class="nav-item nav-search d-none d-lg-block">
-
+                        <!-- <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="search">
+                  <i class="icon-search"></i>
+                </span>
+              </div>
+              <input type="text" class="form-control" placeholder="Search Projects.." aria-label="search" aria-describedby="search">
+            </div> -->
                     </li>
                 </ul>
                 <ul class="navbar-nav navbar-nav-right">
 
-
-
-                    <li class="nav-item dropdown d-flex mr-4 ">
-                        <button class="btn btn-info" id="btnOuvrirModalImportation">Importer donnees</button>
-
-                    </li>
-
+                    <!-- <li class="nav-item dropdown d-flex">
+            <a class="nav-link count-indicator dropdown-toggle d-flex justify-content-center align-items-center" id="messageDropdown" href="#" data-toggle="dropdown">
+              <i class="icon-air-play mx-0"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
+              <p class="mb-0 font-weight-normal float-left dropdown-header">Messages</p>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                    <img src="../images/armoiri.png" alt="image" class="profile-pic">
+                </div>
+                <div class="preview-item-content flex-grow">
+                  <h6 class="preview-subject ellipsis font-weight-normal">David Grey
+                  </h6>
+                  <p class="font-weight-light small-text text-muted mb-0">
+                    The meeting is cancelled
+                  </p>
+                </div>
+              </a>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                    <img src="../images/faces/face2.jpg" alt="image" class="profile-pic">
+                </div>
+                <div class="preview-item-content flex-grow">
+                  <h6 class="preview-subject ellipsis font-weight-normal">Tim Cook
+                  </h6>
+                  <p class="font-weight-light small-text text-muted mb-0">
+                    New product launch
+                  </p>
+                </div>
+              </a>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                    <img src="../images/faces/face3.jpg" alt="image" class="profile-pic">
+                </div>
+                <div class="preview-item-content flex-grow">
+                  <h6 class="preview-subject ellipsis font-weight-normal"> Johnson
+                  </h6>
+                  <p class="font-weight-light small-text text-muted mb-0">
+                    Upcoming board meeting
+                  </p>
+                </div>
+              </a>
+            </div>
+          </li> -->
                     <li class="nav-item dropdown d-flex mr-4 ">
                         <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center"
                             id="notificationDropdown" href="#" data-toggle="dropdown">
@@ -140,10 +132,6 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                             </a>
                         </div>
                     </li>
-
-
-
-
 
                 </ul>
                 <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
@@ -167,124 +155,51 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                         <?= $role_utilisateur ?>
                     </div>
                 </div>
-                <?php require 'menu/sidebar.php'; ?>
+                <?php require 'menu/sidebar.php' ?>
             </nav>
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
 
-                    <h1>LISTE DE TOUS LES ACTES GENERATEURS</h1>
-
-                    <div class="row">
-                        <div class="col-md-4 mb-5">
-                            <label for="anneeSelection">Choisir l'exercice</label>
-
-                            <select class="form-control" id="anneeSelection" name="anneeSelection">
-                                <option value="">Choisr l'exerice</option>
-                                <?php for($i=2024;$i<=date('Y');$i++): ?>
-                                <option value="<?= $i ?>"><?= $i ?></option>
-                                <?php endfor; ?>
-                            </select>
-                        </div>
-                    </div>
-
-
-                    <div id="tableau_acte_generateur"></div>
-
-
-
-
-                    <!-- Modal -->
-                    <div id="selectionModal" class="modal" tabindex="-1" role="dialog">
-                        <div class="modal-dialog" role="document">
+                    <div class="modal fade bd-example-modal-lg" id="modalModifierDonnees" tabindex="-1" role="dialog"
+                        aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Modifier les informations</h5>
+                                    <h5 class="modal-title" id="exampleModalLabel">MODIFIER VOS DONNEES</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form id="formulaireModification" method="post">
-                                        <div class="form-group mb-2">
-                                            <label for="exerciceM">Choisir l'exercice</label>
+                                    <div id="titre"></div>
+                                    <form method="POST" id="formulaireModifierDonnees">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="previsionModifier">Prevision</label>
+                                                    <input type="hidden" name="id_modifier" id="id_modifier">
+                                                    <input type="text" class="form-control" name="previsionModifier"
+                                                        id="previsionModifier">
+                                                </div>
+                                            </div>
 
-                                            <select class="form-control" id="exerciceM" name="exerciceM">
-                                                <option value="">Veuillez choisir</option>
-                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
-                                                <option value="<?= $i ?>"><?= $i ?></option>
-                                                <?php endfor; ?>
-                                            </select>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="mois">Realisation</label>
+                                                    <input type="text" class="form-control" name="realisationModifier"
+                                                        id="realisationModifier">
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="form-group mb-2">
-                                            <label for="serviceM">Choisir le service</label>
-
-                                            <select class="form-control" id="serviceM" name="serviceM">
-
-                                            </select>
+                                        <div class="container">
+                                            <button class="btn btn-info" id="btnModifierDonnees"
+                                                type="submit">Modifier</button>
                                         </div>
-
-                                        <div class="form-group mb-2">
-                                            <label for="categorieActeM">Choisir la categorie</label>
-
-                                            <select class="form-control" id="categorieActeM" name="categorieActeM">
-
-                                            </select>
-                                        </div>
-
-
-
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-info"
-                                                id="confirmAction">Confirmer</button>
-                                            <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">Fermer</button>
-                                        </div>
-                                    </form>
                                 </div>
-
+                                </form>
                             </div>
-                        </div>
-                    </div>
 
-
-                    <div id="modalImporterDonnees" class="modal" tabindex="-1" role="dialog">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Importer les donnees</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <form method="POST" enctype="multipart/form-data" id="formulaireImporter">
-                                        <!-- File Input -->
-                                        <div class="form-group">
-                                            <label for="fichier" class="form-label">Choisir fichier excel File</label>
-                                            <input type="file" id="fichier" name="fichier" class="form-control">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="exercice">Choisir l'exercice</label>
-                                            <select class="form-control" id="exercice" name="exercice">
-                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
-                                                <option value="<?= $i ?>"><?= $i ?></option>
-                                                <?php endfor; ?>
-                                            </select>
-                                        </div>
-
-
-
-                                        <!-- Submit Button -->
-                                        <div class="form-group text-center mt-4">
-                                            <button type="submit" id="btnImporter"
-                                                class="btn btn-info btn-lg">Importer</button>
-                                        </div>
-                                    </form>
-                                </div>
-
-                            </div>
                         </div>
                     </div>
 
@@ -311,7 +226,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
-                                                    <label for="mois">Choisir le mois</label>
+                                                    <label for="mois">Choisir les colonnes à importer</label>
                                                     <select class="form-control" id="mois" name="mois">
                                                         <option value="1">Janvier</option>
                                                         <option value="2">Février</option>
@@ -441,8 +356,63 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                         </div>
                     </div>
 
+                    <div class="container">
+                        <h2>MODIFIER MES DONNEES</h2>
+                        <div class="container">
+                            <form method="post" id="formualireVoirDonnees">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="label" for="moisVoirDonnees">Mois</label>
+                                            <select class="form-control" id="moisVoirDonnees" name="moisVoirDonnees">
+                                                <option value="1">Janvier</option>
+                                                <option value="2">Février</option>
+                                                <option value="3">Mars</option>
+                                                <option value="4">Avril</option>
+                                                <option value="5">Mai</option>
+                                                <option value="6">Juin</option>
+                                                <option value="7">Juillet</option>
+                                                <option value="8">Aout</option>
+                                                <option value="9">Septembre</option>
+                                                <option value="10">Octobre</option>
+                                                <option value="11">Novembre</option>
+                                                <option value="12">Décembre</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="anneeVoirDonnees">Choisir l'annee</label>
+                                            <select class="form-control" id="anneeVoirDonnees" name="anneeVoirDonnees">
+                                                <option value="">Veuillez choisir l'annee</option>
+                                                <?php for($i=2024;$i<=date('Y');$i++): ?>
+                                                <option value="<?= $i ?>"><?= $i ?></option>
+                                                <?php endfor; ?>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="servicesM">Choisir le service</label>
+                                            <select class="form-control" id="servicesM" name="servicesM">
+                                                <option value="">Veuillez choisir le service</option>
+
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button id="btnVoirDonnees" class="btn btn-info">Afficher</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
 
+                    <div id="tableau_voir_mes_donnees"></div>
 
 
                 </div>
@@ -455,239 +425,56 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
     </div>
     <!-- container-scroller -->
 
+    <!-- base:js -->
     <?php require 'footer/footer.php' ?>
-
-
-
+    <!-- End custom js for this page-->
     <script>
         $(document).ready(function () {
 
-            actes_generateurs()
+            $(".importerDonneesExcel").click(function () {
+                event.preventDefault();
 
-
-            $("#anneeSelection").change(function () {
-                var anneeSelection = $(this).val();
-
-                if (anneeSelection != "") {
-                    $.ajax({
-                        url: 'traitement/tableau_actes_generateurs.php',
-                        method: 'POST',
-                        dataType: 'html',
-                        data: {
-                            anneeSelection: anneeSelection
-                        },
-                        success: function (response) {
-                            document.getElementById('tableau_acte_generateur')
-                                .innerHTML = response
-                        },
-                        error: function (xhr, ajaxOptions, thrownError) {
-                            console.log(xhr.status);
-                            console.log(thrownError);
-                        }
-                    })
-                }
+                $("#modalImporterDonneesExcel").modal("show");
             })
 
-
-
-            $("#exerciceM").change(function () {
-                var exercice = $(this).val();
-
-                if (exercice != "") {
-                    $.ajax({
-                        url: 'traitement/selectServicesParExercice.php',
-                        method: 'POST',
-                        dataType: 'html',
-                        data: {
-                            exerciceM: exercice
-                        },
-                        success: function (response) {
-                            $("#serviceM").html(response)
-                        },
-                        error: function (xhr, ajaxOptions, thrownError) {
-                            console.log(xhr.status);
-                            console.log(thrownError);
-                        }
-                    })
-                }
-            })
-
-            $("#serviceM").change(function () {
-                var service = $(this).val();
-
-                if (exercice != "") {
-                    $.ajax({
-                        url: 'traitement/selectCategorieActeParService.php',
-                        method: 'POST',
-                        dataType: 'html',
-                        data: {
-                            service: service
-                        },
-                        success: function (response) {
-                            $("#categorieActeM").html(response)
-                        },
-                        error: function (xhr, ajaxOptions, thrownError) {
-                            console.log(xhr.status);
-                            console.log(thrownError);
-                        }
-                    })
-                }
-            })
-
-
-
-
-            $("#btnOuvrirModalImportation").on('click', function () {
-                $("#modalImporterDonnees").modal("show");
-            })
-
-            function actes_generateurs() {
-                var anneeSelection = $("#anneeSelection").val();
-
-                $.ajax({
-                    url: 'traitement/tableau_actes_generateurs.php',
-                    method: 'POST',
-                    dataType: 'html',
-                    data: {
-                        anneeSelection: anneeSelection
-                    },
-                    success: function (response) {
-                        document.getElementById('tableau_acte_generateur').innerHTML = response
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        console.log(xhr.status);
-                        console.log(thrownError);
-                    }
-                })
-            }
-
-
-
-
-            // Désactiver le menu contextuel par défaut
-            $(document).on('contextmenu', function (e) {
-                e.preventDefault();
-            });
-
-            // Fonction pour obtenir les éléments sélectionnés
-            function getSelectedItems() {
-                const selected = [];
-                $('.row-checkbox:checked').each(function () {
-                    selected.push($(this).val());
-                });
-                return selected;
-            }
-
-            // Gérer le clic droit pour ouvrir le modal
-            $(document).on('mousedown', function (e) {
-                if (e.which === 3) { // Vérifie si le clic droit est effectué
-                    var selectedItems = getSelectedItems();
-                    if (selectedItems.length > 0) {
-                        // Ouvrir le modal
-                        $('#selectionModal').modal('show');
-                    } else {
-                        Swal.fire({
-                            title: "Erreur!",
-                            text: "Veuillez sélectionner au moins un élément avant de continuer",
-                            icon: "error"
-                        });
-
-                    }
-                }
-            });
-
-            // Gérer la soumission à partir du bouton dans le modal
-            $('#confirmAction').on('click', function () {
-                // Récupérer les valeurs des cases cochées
-                var selectedIds = getSelectedItems();
-                var exerice = $("#exerciceM").val(); // Récupérer la province
-                var service = $("#serviceM").val(); // Récupérer la province
-                var categorieActe = $("#categorieActeM").val(); // Récupérer la province
-
-
-
-                // Vérifier si au moins une case est cochée
-                if (selectedIds.length === 0) {
-                    Swal.fire({
-                        title: "Erreur!",
-                        text: "Veuillez selectionner au moins un service",
-                        icon: "error"
-                    });
-                    return;
-                }
-
-                // Envoi des données via Ajax
-                $.ajax({
-                    url: 'traitement/affecter_categorie_acte_et_service_dans_acte_generateur.php', // URL du script PHP
-                    method: 'POST', // Méthode HTTP
-                    data: {
-                        ids: selectedIds,
-                        exercice: exerice,
-                        service: service,
-                        categorieActe: categorieActe
-                    }, // Données envoyées
-                    success: function (response) {
-                        console.log('Réponse brute du serveur:',
-                            response); // Affichez la réponse brute
-                        try {
-                            const jsonResponse = JSON.parse(
-                                response); // Tentez de parser en JSON
-                            if (jsonResponse.status === 'success') {
-                                // Mettre à jour la vue
-                                actes_generateurs();
-
-                                // Message de succès
-                                Swal.fire({
-                                    title: "Operation reussie!",
-                                    text: "Centre ajoute avec succes",
-                                    icon: "success"
-                                });
-
-                                $('#selectionModal').modal('hide'); // Fermer le modal
-                            } else {
-                                // Message d'erreur
-
-                                Swal.fire({
-                                    title: "Erreur!",
-                                    text: "Une erreur est survennue",
-                                    icon: "error"
-                                });
-                            }
-                        } catch (e) {
-                            Swal.fire({
-                                title: "Erreur!",
-                                text: "Une erreur est survennue",
-                                icon: "error"
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire({
-                            title: "Erreur!",
-                            text: "Une erreur est survennue",
-                            icon: "error"
-                        });
-                    }
-                });
-            });
-
-
-
-            $('#formulaireImporter').submit(function () {
+            $('#formualireVoirDonnees').submit(function () {
                 event.preventDefault()
-                var formulaireImporter = new FormData($('#formulaireImporter')[0]);
 
-                $("#btnImporter").text('Chargement...')
-                $("#btnImporter").prop('disabled', true);
+                $("#btnVoirDonnees").text('Chargement...')
+                $("#btnVoirDonnees").prop('disabled', true);
                 $.ajax({
-                    url: 'traitement/importeractesgenerateurs.php',
+                    url: 'traitement/tableau_mes_donnees_mensuelles_a_modifier.php',
+                    type: 'POST',
+                    data: $("#formualireVoirDonnees").serialize(),
+                    dataType: 'html',
+                    success: function (response) {
+                        console.log(response);
+                        document.getElementById("tableau_voir_mes_donnees").innerHTML =
+                            response
+                    },
+                    error: function () {
+                        alert('Erreur');
+                    },
+                    complete: function () {
+                        $("#btnVoirDonnees").text('Afficher')
+                        $("#btnVoirDonnees").prop('disabled', false);
+                    }
+                });
+            });
+
+            $('#btnImporterDonneesExcel').click(function () {
+                event.preventDefault()
+                var formulaireImporter = new FormData($('#formulaireImporterDonneesExcel')[0]);
+                $("#btnImporterDonneesExcel").text('Chargement...')
+                $("#btnImporterDonneesExcel").prop('disabled', true);
+                $.ajax({
+                    url: 'traitement/importer_donnees_excel.php',
                     type: 'POST',
                     data: formulaireImporter,
                     contentType: false,
                     processData: false,
                     success: function (response) {
                         if (response === "Success") {
-                            actes_generateurs()
 
 
                             Swal.fire({
@@ -697,7 +484,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                                 showConfirmButton: false,
                                 timer: 1500
                             });
-                            // location.href = "consulterdonnees"
+                            location.href = "consulterdonnees"
 
                         } else if (response === "Type de fichier invalide") {
                             Swal.fire({
@@ -723,8 +510,8 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                         alert('Erreur');
                     },
                     complete: function () {
-                        $("#btnImporter").text('Importer')
-                        $("#btnImporter").prop('disabled', false);
+                        $("#btnImporterDonneesExcel").text('Importer')
+                        $("#btnImporterDonneesExcel").prop('disabled', false);
                     }
                 });
             });
@@ -766,6 +553,160 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
             })
 
 
+
+
+            $("#anneeVoirDonnees").change(function () {
+                var exerciceM = $(this).val();
+
+                $.ajax({
+                    url: 'traitement/selectServicesParExercice.php',
+                    method: 'POST',
+                    data: {
+                        exerciceM: exerciceM
+                    },
+                    error: function (error) {
+                        console.log("Erreur lors de la requête" + error);
+                    },
+                    dataType: 'html',
+                    success: function (response) {
+                        $("#services").html(response);
+                    }
+                })
+            })
+
+            $(document).on('click', '.btnModifierMesDonnees', function () {
+
+                var mois = $('#moisVoirDonnees').val();
+                var annee = $('#anneeVoirDonnees').val();
+                var services = $("#services").val();
+                var id_modifier = $(this).attr('id');
+                $("#id_modifier").val(id_modifier)
+
+                $.ajax({
+                    url: 'traitement/recuper_titre_par_id.php',
+                    method: 'POST',
+                    data: {
+                        id_modifier: id_modifier
+                    },
+                    dataType: 'html',
+                    success: function (response) {
+                        console.log(response);
+                        $("#titre").html(response)
+
+
+                    },
+                    error: function () {
+                        alert('Erreur');
+                    }
+                })
+
+                $.ajax({
+                    url: 'traitement/recuper_champs_prevision_realisation_par_id.php',
+                    method: 'POST',
+                    data: {
+                        id_modifier: id_modifier
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log(response);
+                        $("#previsionModifier").val(response.prevision)
+                        $("#realisationModifier").val(response.realisation)
+
+                        $("#modalModifierDonnees").modal("show");
+
+
+                    },
+                    error: function () {
+                        alert('Erreur');
+                    }
+                })
+
+
+            })
+
+            function tableau(servicesM, mois, annee) {
+                $.ajax({
+                    url: 'traitement/tableau_mes_donnees_mensuelles_a_modifier.php',
+                    type: 'POST',
+                    data: {
+                        servicesM: servicesM,
+                        moisVoirDonnees: mois,
+                        anneeVoirDonnees: annee
+                    },
+                    dataType: 'html',
+                    success: function (response) {
+                        console.log(response);
+                        document.getElementById("tableau_voir_mes_donnees").innerHTML = response
+                    },
+                    error: function () {
+                        alert('Erreur');
+                    },
+
+                });
+            }
+
+
+            $("#formulaireModifierDonnees").submit(function () {
+                event.preventDefault()
+
+                $("#btnModifierDonnees").text('Chargement...')
+                $("#btnModifierDonnees").prop('disabled', true);
+
+                $.ajax({
+                    url: 'traitement/modifier_mes_donnees.php',
+                    type: 'POST',
+                    data: $("#formulaireModifierDonnees").serialize(),
+                    dataType: 'text',
+                    success: function (response) {
+                        console.log(response);
+                        if (response == 'success') {
+                            // alert(response);
+
+                            Swal.fire({
+                                title: "Operationnn reussie!",
+                                text: "Donnees modifiees",
+                                icon: "success"
+                            });
+                            var mois = $("#moisVoirDonnees").val()
+                            var annee = $("#anneeVoirDonnees").val()
+                            var services = $("#servicesM").val()
+
+                            tableau(services, mois, annee)
+                            $("#modalModifierDonnees").modal("hide");
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Erreur');
+                    },
+                    complete: function () {
+                        $("#btnModifierDonnees").text('Modifier')
+                        $("#btnModifierDonnees").prop('disabled', false);
+                    }
+                })
+            })
+
+            $("#anneeVoirDonnees").change(function () {
+                var exerciceM = $(this).val();
+
+                $.ajax({
+                    url: 'traitement/selectServicesParExercice.php',
+                    method: 'POST',
+                    data: {
+                        exerciceM: exerciceM
+                    },
+                    error: function (error) {
+                        console.log("Erreur lors de la requête" + error);
+                    },
+                    dataType: 'html',
+                    success: function (response) {
+                        $("#servicesM").html(response);
+                    }
+                })
+            })
+
+
             $("#annee").change(function(){
                 var exerciceM = $(this).val();
                 
@@ -782,6 +723,9 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
                     }
                 })
             })
+
+
+
 
 
 
