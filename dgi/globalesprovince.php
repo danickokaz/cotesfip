@@ -70,13 +70,13 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                 JOIN province p ON s.id_province = p.id
                 JOIN dgi_centre_perception cp ON s.id_centre_perception = cp.id
                 JOIN dgi_nature_impot ni ON s.id_ordre = ni.id
-                WHERE s.annee = ?
+                WHERE s.annee = ? AND s.id_etat_donnee=?
                 GROUP BY p.libelle_province, cp.libelle_centre, s.id_mois, s.annee
                 ORDER BY s.id_province, s.id_centre_perception, s.id_mois;
             ";
         
             $stmt = database()->prepare($sql);
-            $stmt->execute([$annee]);
+            $stmt->execute([$annee,3]);
             $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
             // Organisation des données par province et centre

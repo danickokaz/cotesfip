@@ -1,32 +1,32 @@
 <?php
 session_start();
 require __DIR__.'../../settings/bdd.php';
-if (isset($_SESSION['access']) and !empty($_SESSION['access'])) {
-    $session = htmlspecialchars($_SESSION['access']);
+if (isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])) {
+    $session = htmlspecialchars($_SESSION['jlk']);
 
-    $req = database()->prepare("
-        SELECT 
-            dgda_utilisateur.token_utilisateur,
-            dgda_utilisateur.pseudo,
-            dgda_utilisateur.id,
-            dgda_utilisateur.id_role,
-            dgda_utilisateur.id_service_pourvoyeur,
-            service_pourvoyeur.abreviation as service_utilisateur,
-            role_utilisateur.libelle_role as role_utilisateur,
-            dgda_centre_perception.libelle_centre_perception as centre_perception
-        FROM dgda_utilisateur 
-        INNER JOIN service_pourvoyeur ON dgda_utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
-        INNER JOIN role_utilisateur ON dgda_utilisateur.id_role = role_utilisateur.id
-        LEFT JOIN dgda_centre_perception ON dgda_centre_perception.id = dgda_utilisateur.id_centre_perception
-        WHERE token_utilisateur = ?");
+    $req = database()->prepare("SELECT 
+        dgrad_utilisateur.token_utilisateur,
+        dgrad_utilisateur.pseudo,
+        dgrad_utilisateur.id,
+        dgrad_utilisateur.id_role,
+        service_pourvoyeur.abreviation as service_utilisateur,
+        role_utilisateur.libelle_role as role_utilisateur,
+        province.libelle_province as libelle_province
+        FROM dgrad_utilisateur 
+        INNER JOIN service_pourvoyeur ON dgrad_utilisateur.id_service_pourvoyeur = service_pourvoyeur.id
+        INNER JOIN role_utilisateur ON dgrad_utilisateur.id_role = role_utilisateur.id
+        LEFT JOIN province ON  province.id = dgrad_utilisateur.id_province
+        WHERE token_utilisateur=?");
     $req->execute([$session]);
 
     if ($req->rowCount() == 1) {
         $donneesUtilisateur = $req->fetch(PDO::FETCH_OBJ);
         $pseudo = $donneesUtilisateur->pseudo;
-        $service_utilisateur = $donneesUtilisateur->service_utilisateur;
+        $service_utilisateur  = $donneesUtilisateur->service_utilisateur;
         $role_utilisateur = $donneesUtilisateur->role_utilisateur;
-        $centre_perception = $donneesUtilisateur->centre_perception;
+        $id_role = $donneesUtilisateur->id_role;
+
+        $libelle_province  = $donneesUtilisateur->libelle_province;
 
         if (isset($_GET['annee']) and !empty($_GET['annee'])) {
             $annee = htmlspecialchars($_GET['annee']);
@@ -51,15 +51,15 @@ if (isset($_SESSION['access']) and !empty($_SESSION['access'])) {
                 $sql = "
                     SELECT 
                         p.libelle_province,
-                        s.id_mois,
+                        s.mois,
                         s.annee,
                         SUM(s.prevision) AS total_prevision,
                         SUM(s.realisation) AS total_realisation
-                    FROM dgda_statistique s
+                    FROM dgrad_statistique s
                     JOIN province p ON s.id_province = p.id
                     WHERE s.annee = ? AND s.id_etat_donnee=?
-                    GROUP BY p.libelle_province, s.id_mois, s.annee
-                    ORDER BY p.libelle_province, s.id_mois;
+                    GROUP BY p.libelle_province, s.mois, s.annee
+                    ORDER BY p.libelle_province, s.mois;
                 ";
 
                 $stmt = database()->prepare($sql);
@@ -70,7 +70,7 @@ if (isset($_SESSION['access']) and !empty($_SESSION['access'])) {
                 $data_grouped = [];
                 foreach ($resultats as $row) {
                     $province = $row['libelle_province'];
-                    $mois = (int)$row['id_mois'];
+                    $mois = (int)$row['mois'];
 
                     if (!isset($data_grouped[$province])) {
                         $data_grouped[$province] = array_fill(1, 12, ['prevision' => 0, 'realisation' => 0]);
@@ -115,7 +115,7 @@ if (isset($_SESSION['access']) and !empty($_SESSION['access'])) {
 </head>
 <body>
     <div class="container-fluid mt-5">
-        <h1 class="text-center mb-4">Tableau DGDA - Totaux par Province - <?= $annee ?></h1>
+        <h1 class="text-center mb-4">Tableau DGRAD - Totaux par Province - <?= $annee ?></h1>
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>

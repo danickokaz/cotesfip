@@ -23,11 +23,13 @@ if(isset($_SESSION['kedadaje']) and !empty($_SESSION['kedadaje'])){
             statistiques_globales.annee,
             province_dgi.libelle_province AS dgi_province_depart,
             province_dgda.libelle_province AS dgda_province_depart,
+            province_dgrad.libelle_province AS dgrad_province_depart,
             province_finale.libelle_province_fin
             FROM statistiques_globales
             LEFT JOIN mois ON mois.id = statistiques_globales.id_mois
             LEFT JOIN province AS province_dgi ON province_dgi.id = statistiques_globales.dgi_province
             LEFT JOIN province AS province_dgda ON province_dgda.id = statistiques_globales.dgda_id_province
+            LEFT JOIN province AS province_dgrad ON province_dgrad.id = statistiques_globales.dgrad_id_province
             LEFT JOIN province_finale ON province_finale.id = statistiques_globales.id_province_finale
             WHERE statistiques_globales.id_service_pourvoyeur = ?
             GROUP BY code_transfert ORDER BY id DESC");
@@ -91,7 +93,24 @@ if(isset($_SESSION['kedadaje']) and !empty($_SESSION['kedadaje'])){
                         </table>
                     ';
                 }else{
-                    
+                    foreach($data as $d){
+                        $output.= '
+                            <tr>
+                                <td>'.$i.'</td>
+                                <td>'.$d->date_transfert.'</td>
+                                <td>'.$d->code_transfert.'</td>
+                                <td>'.$d->libelle_mois.' '.$d->annee.'</td>
+                                <td>'.$d->dgrad_province_depart.'</td>
+                                <td>'.$d->libelle_province_fin.'</td>
+                                <td><i class="fa fa-trash supprimer" style="color:red;cursor:pointer;" id="'.$d->code_transfert.'" ></i></td>
+
+                            </tr>';
+                        $i++;
+                    }
+                    $output.= '
+                        </tbody>
+                        </table>
+                    ';
                 }
 
                 

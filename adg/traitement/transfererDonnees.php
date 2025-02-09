@@ -58,7 +58,7 @@ if(isset($_SESSION['kedadaje']) and !empty($_SESSION['kedadaje'])){
                         
 
                         $req = database()->prepare("SELECT * FROM statistiques_globales WHERE
-                        id_mois=? AND annee=? AND dgi_id_centre_perception=?  AND dgi_province=? AND id_province_finale=? AND code_recette=? AND libelle_recette=?");
+                        id_mois=? AND annee=? AND dgi_id_centre_perception=?  AND dgi_province=? AND id_province_finale=? AND (code_recette=? OR code_recette IS NULL) AND (libelle_recette=? OR libelle_recette IS NULL)");
                         $req->execute([$mois, $annee,$id_centre_perception,$provinces,$provinces_finales,$code_nature,$libelle_nature_recette]);
 
                         if($req->rowCount()==0){
@@ -103,7 +103,7 @@ if(isset($_SESSION['kedadaje']) and !empty($_SESSION['kedadaje'])){
                         
 
                         $req = database()->prepare("SELECT * FROM statistiques_globales WHERE
-                        id_mois=? AND annee=? AND dgda_id_centre_perception=?  AND dgda_id_province=? AND id_province_finale=? AND code_recette=? AND libelle_recette=?");
+                        id_mois=? AND annee=? AND dgda_id_centre_perception=?  AND dgda_id_province=? AND id_province_finale=? AND (code_recette=? OR code_recette IS NULL) AND (libelle_recette=? OR libelle_recette IS NULL)");
                         $req->execute([$mois, $annee,$id_centre_perception,$provinces,$provinces_finales,$code_nature,$libelle_nature_recette]);
 
                         if($req->rowCount()==0){
@@ -125,6 +125,102 @@ if(isset($_SESSION['kedadaje']) and !empty($_SESSION['kedadaje'])){
             }
             //DGRAD
             else if($id_service_affecte==3){
+
+                $req = database()->prepare("SELECT * FROM dgrad_statistique WHERE mois=? AND annee=? AND id_province=? AND id_etat_donnee=?");
+                $req->execute([$mois,$annee,$provinces,3]);
+
+                if($req->rowCount()>=1){
+                    $donneesDGRAD = $req->fetchAll(PDO::FETCH_OBJ);
+
+                    foreach($donneesDGRAD as $donneeDGRAD){
+
+                        $id_ordre = $donneeDGRAD->id_ordre;
+                        $id_type_recette = $donneeDGRAD->id_type_recette;
+                        $id_categorie_recette = $donneeDGRAD->id_categorie_recette;
+                        $id_service_assiette = $donneeDGRAD->id_service_assiette;
+                        $id_categorie_acte = $donneeDGRAD->id_categorie_acte;
+                        $id_province_dgrad = $donneeDGRAD->id_province;
+                        $code_acte = $donneeDGRAD->code_acte;
+                        $libelle_acte = $donneeDGRAD->libelle_acte;
+                        $prevision = $donneeDGRAD->prevision;
+                        $realisation  = $donneeDGRAD->realisation;
+                        $id_etat_donnee = $donneeDGRAD->id_etat_donnee;
+                        $mois = $donneeDGRAD->mois;
+                        $annee = $donneeDGRAD->annee;
+
+                        $req = database()->prepare("SELECT * FROM statistiques_globales WHERE 
+                        (code_recette = ? OR code_recette IS NULL) 
+                        AND (libelle_recette = ? OR libelle_recette IS NULL) 
+                        AND (dgrad_id_categorie_recette = ? OR dgrad_id_categorie_recette IS NULL) 
+                        AND dgrad_id_type_recette = ?
+                        AND dgrad_id_service_assiette = ?
+                        AND dgrad_id_categorie_acte = ?
+                        AND id_mois = ?
+                        AND annee = ?
+                        AND dgrad_id_province = ?
+                        AND id_province_finale = ?");
+
+                        $req->execute([
+                        $code_acte,
+                        $libelle_acte,
+                        $id_categorie_recette,
+                        $id_type_recette,
+                        $id_service_assiette,
+                        $id_categorie_acte,
+                        $mois,
+                        $annee,
+                        $provinces,
+                        $provinces_finales]);
+
+                        if($req->rowCount()==0){
+                            $req = database()->prepare("INSERT INTO statistiques_globales (
+                            code_transfert,
+                            id_etat_donnee,
+                            id_service_pourvoyeur,
+                            id_mois,
+                            annee,
+                            prevision,
+                            realisation,
+                            date_transfert,
+                            id_province_finale,
+                            code_recette,
+                            libelle_recette,
+                            dgrad_id_type_recette,
+                            dgrad_id_categorie_recette,
+                            dgrad_id_service_assiette,
+                            dgrad_id_categorie_acte,
+                            dgrad_id_province
+                            )
+                            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                            $req->execute([
+                            time()."/".$id_service_affecte,
+                            3,
+                            $id_service_affecte,
+                            $mois,
+                            $annee,
+                            $prevision,
+                            $realisation,
+                            date('Y-m-d'),
+                            $provinces_finales,
+                            $code_acte,
+                            $libelle_acte,
+                            $id_type_recette,
+                            $id_categorie_recette,
+                            $id_service_assiette,
+                            $id_categorie_acte,
+                            $provinces]);
+                        }
+
+
+
+                    }
+
+                    echo "success";
+
+
+                }else{
+                    echo "Pas pretes";
+                }
 
             }else{
 

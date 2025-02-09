@@ -63,13 +63,13 @@ if(isset($_SESSION['visa']) and !empty($_SESSION['visa'])){
                 FROM dgi_statistique s
                 LEFT JOIN dgi_categorie_nature_impot cni ON s.id_categorie_nature_recette = cni.id
                 LEFT JOIN dgi_type_nature_impot tni ON s.id_type_nature_recette = tni.id
-                WHERE s.annee=?
+                WHERE s.annee=? AND s.id_etat_donnee=?
                 GROUP BY s.id_mois, s.libelle_nature_recette, cni.libelle_categorie_nature_impot, tni.libelle_nature_impot
                 ORDER BY s.id_ordre, s.id_mois;
             ";
         
             $stmt = database()->prepare($sql);
-            $stmt->execute([$annee]);
+            $stmt->execute([$annee,3]);
             $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
             // Natures à exclure des totaux (Prévision Exclu)

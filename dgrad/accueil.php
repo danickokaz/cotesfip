@@ -353,7 +353,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
             </div>
           </div>
 
-          <div class="card-container">
+          <!-- <div class="card-container">
             <div class="card">
               <i class="fas fa-cogs"></i>
               <div class="random-number">42</div>
@@ -379,7 +379,7 @@ if(isset($_SESSION['jlk']) and !empty($_SESSION['jlk'])){
               <div class="random-number">72</div>
               <div class="label">Label 5</div>
             </div>
-          </div>
+          </div> -->
 
         </div>
         <!-- content-wrapper ends -->

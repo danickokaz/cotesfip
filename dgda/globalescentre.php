@@ -57,13 +57,13 @@ if (isset($_SESSION['access']) and !empty($_SESSION['access'])) {
                         SUM(s.realisation) AS total_realisation
                     FROM dgda_statistique s
                     JOIN dgda_centre_perception cp ON s.id_centre_perception = cp.id
-                    WHERE s.annee = ?
+                    WHERE s.annee = ? AND s.id_etat_donnee=?
                     GROUP BY cp.libelle_centre_perception, s.id_mois, s.annee
                     ORDER BY cp.libelle_centre_perception, s.id_mois;
                 ";
 
                 $stmt = database()->prepare($sql);
-                $stmt->execute([$annee]);
+                $stmt->execute([$annee,3]);
                 $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // Organisation des données par province et mois

@@ -62,13 +62,13 @@ if (isset($_SESSION['access']) and !empty($_SESSION['access'])) {
                     FROM dgda_statistique s
                     LEFT JOIN dgda_categorie_nature_economique cni ON s.id_categorie_nature_economique = cni.id
                     LEFT JOIN dgda_type_nature_economique tni ON s.id_type_nature_economique = tni.id
-                    WHERE s.annee = ?
+                    WHERE s.annee = ? AND s.id_etat_donnee=?
                     GROUP BY s.id_mois, s.libelle_nature_economique, cni.libelle_nature_economique, tni.libelle_type_nature_economique
                     ORDER BY s.id_ordre, s.id_mois;
                 ";
 
                 $stmt = database()->prepare($sql);
-                $stmt->execute([$annee]);
+                $stmt->execute([$annee,3]);
                 $resultats = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $data_grouped_by_type = [];
